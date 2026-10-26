@@ -1,0 +1,3366 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>North Town NTRP | لوحة تحكم السيرفر التفاعلية الشاملة</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Font Cairo -->
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+  <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        tactical: {
+                            bg: '#07090e',
+                            card: '#111723',
+                            border: '#1e293b',
+                            accent: '#f59e0b',
+                            fbi: '#3b82f6',
+                            cia: '#10b981',
+                            iaa: '#a855f7'
+                        }
+                    },
+                    fontFamily: {
+                        cairo: ['Cairo', 'sans-serif']
+                    }
+                }
+            }
+        }
+  </script>
+  <style>
+        :root {
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --bg-hover: #334155;
+            --accent-blue: #3b82f6;
+            --accent-gold: #f59e0b;
+            --accent-red: #ef4444;
+            --accent-green: #10b981;
+            --accent-purple: #8b5cf6;
+            --accent-owner: #ec4899;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Top Navbar */
+        header {
+            background-color: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .menu-btn {
+            background: none;
+            border: none;
+            color: var(--text-main);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .menu-btn:hover {
+            color: var(--accent-blue);
+        }
+
+        .brand-container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand-title {
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            background: linear-gradient(45deg, #3b82f6, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-subtitle {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .user-status {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.9rem;
+            background: var(--bg-card);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            background-color: var(--accent-green);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--accent-green);
+        }
+
+        /* Slideout Navigation Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            right: -320px;
+            width: 320px;
+            height: 100%;
+            background-color: #0b1120;
+            box-shadow: -5px 0 25px rgba(0, 0, 0, 0.8);
+            z-index: 200;
+            transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            border-left: 1px solid var(--border-color);
+        }
+
+        .sidebar.active {
+            right: 0;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-card);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .close-btn:hover {
+            color: var(--accent-red);
+        }
+
+        .nav-list {
+            list-style: none;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.85rem 1rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .nav-link i {
+            width: 24px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background-color: var(--bg-hover);
+            color: var(--text-main);
+            border-right: 4px solid var(--accent-blue);
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(3px);
+            z-index: 150;
+            display: none;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        /* Main Content Container */
+        main {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .section-panel {
+            display: none;
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+
+        .section-panel.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Server Header Banner for Sections */
+        .server-banner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(90deg, #1e293b, #0f172a);
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 1.5rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .server-tag {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--accent-blue);
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-weight: bold;
+            border: 1px solid var(--accent-blue);
+        }
+
+        /* Authentication Cards */
+        .auth-card {
+            max-width: 520px;
+            margin: 2rem auto;
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 2.5rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+
+        .auth-card h2 {
+            margin-bottom: 0.5rem;
+            color: var(--accent-blue);
+        }
+
+        .auth-card p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+            text-align: right;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: var(--bg-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-main);
+            font-size: 1rem;
+            outline: none;
+            transition: border 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--accent-blue);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 0.85rem;
+            border: none;
+            border-radius: 6px;
+            background: var(--accent-blue);
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 1rem;
+        }
+
+        .btn:hover { background: #2563eb; }
+        .btn-danger { background: var(--accent-red); }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-success { background: var(--accent-green); }
+        .btn-success:hover { background: #059669; }
+        .btn-purple { background: var(--accent-purple); }
+        .btn-purple:hover { background: #7c3aed; }
+        .btn-owner { background: linear-gradient(45deg, #ec4899, #8b5cf6); }
+        .btn-owner:hover { background: linear-gradient(45deg, #db2777, #7c3aed); }
+
+        /* Dashboard Internal Grids */
+        .dash-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: var(--bg-card);
+            padding: 1.5rem;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            padding: 1.5rem;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .table-container {
+            background: var(--bg-card);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: right;
+        }
+
+        th, td {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background: rgba(0,0,0,0.2);
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .badge {
+            padding: 0.3rem 0.7rem;
+            border-radius: 12px;
+            font-size: 0.78rem;
+            font-weight: bold;
+        }
+        .badge-commander { background: rgba(245, 158, 11, 0.2); color: var(--accent-gold); border: 1px solid var(--accent-gold); }
+        .badge-officer { background: rgba(59, 130, 246, 0.2); color: var(--accent-blue); border: 1px solid var(--accent-blue); }
+        .badge-enlisted { background: rgba(16, 185, 129, 0.2); color: var(--accent-green); border: 1px solid var(--accent-green); }
+        .badge-intel { background: rgba(139, 92, 246, 0.2); color: var(--accent-purple); border: 1px solid var(--accent-purple); }
+        .badge-owner { background: rgba(236, 72, 153, 0.2); color: var(--accent-owner); border: 1px solid var(--accent-owner); }
+
+        .sys-card {
+            background: #0f172a;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.2rem;
+            margin-top: 1rem;
+        }
+
+        /* Credit Card Visually Stylized */
+        .credit-card-ui {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            border-radius: 12px;
+            padding: 15px 20px;
+            color: white;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+            position: relative;
+        }
+
+        .credit-card-ui.gold-card {
+            background: linear-gradient(135deg, #f59e0b, #b45309);
+        }
+
+        .credit-card-ui.purple-card {
+            background: linear-gradient(135deg, #8b5cf6, #5b21b6);
+        }
+
+        .credit-card-ui.frozen-card {
+            background: linear-gradient(135deg, #475569, #1e293b) !important;
+            opacity: 0.7;
+            border: 2px dashed var(--accent-red);
+        }
+
+        .card-num-disp {
+            font-family: monospace;
+            letter-spacing: 2px;
+            font-size: 1.1rem;
+            margin: 12px 0;
+        }
+
+        .card-holder-disp {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: #e2e8f0;
+        }
+
+        /* Gangs / Dark Web Styling */
+        .gang-card {
+            background: #18181b;
+            border: 1px solid #27272a;
+            border-right: 4px solid var(--accent-red);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        /* Mode Selector Tab */
+        .identity-toggle {
+            display: flex;
+            background: var(--bg-dark);
+            padding: 4px;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .toggle-btn {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            background: none;
+            color: var(--text-muted);
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+
+        .toggle-btn.active {
+            background: var(--accent-blue);
+            color: white;
+        }
+
+        /* Custom Footer Badge for Home Page */
+        .made-by-nt-badge {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 1rem;
+            background: var(--bg-card);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            font-weight: bold;
+            font-size: 0.9rem;
+            color: var(--accent-gold);
+            letter-spacing: 1px;
+        }
+
+        /* Federal Bureau Integrated CSS */
+        .glass-panel {
+            background: rgba(17, 23, 35, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        @keyframes pulse-gold {
+            0%, 100% { border-color: rgba(245, 158, 11, 0.4); box-shadow: 0 0 10px rgba(245, 158, 11, 0.1); }
+            50% { border-color: rgba(245, 158, 11, 1); box-shadow: 0 0 20px rgba(245, 158, 11, 0.3); }
+        }
+        .pulse-gold {
+            animation: pulse-gold 2s infinite;
+        }
+
+        /* Responsive UI */
+        @media (max-width: 768px) {
+            header { padding: 1rem; }
+            main { padding: 1rem; }
+            .dash-header { flex-direction: column; gap: 1rem; align-items: flex-start; }
+        }
+  </style>
+ </head>
+ <body>
+  <!-- Overlay -->
+  <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+  <!-- Sidebar Drawer -->
+  <aside class="sidebar" id="sidebar">
+   <div class="sidebar-header">
+    <div>
+     <h3><i class="fa-solid fa-layer-group"></i> أقسام السيرفر</h3>
+     <span style="font-size:0.75rem; color:var(--accent-blue); font-weight:bold;">North Town NTRP</span>
+    </div>
+    <button class="close-btn" onclick="toggleSidebar()"><i class="fa-solid fa-xmark"></i></button>
+   </div>
+   <ul class="nav-list">
+    <li class="nav-item"><a class="nav-link active" onclick="switchSection('home')"> <i class="fa-solid fa-house" style="color: #60a5fa;"></i> الصفحة الرئيسية / الهويات </a></li>
+    <li class="nav-item"><a class="nav-link" onclick="switchSection('owner')"> <i class="fa-solid fa-crown" style="color: #ec4899;"></i> داتشبورد المالك (Owner) </a></li>
+    <li class="nav-item"><a class="nav-link" onclick="switchSection('bureau')"> <i class="fa-solid fa-building-shield" style="color: #f59e0b;"></i> الاستخبارات الوطنية (DNI) </a></li>
+    <li class="nav-item"><a class="nav-link" onclick="switchSection('interior')"> <i class="fa-solid fa-shield-halved" style="color: #3b82f6;"></i> وزارة الداخلية </a></li>
+    <li class="nav-item"><a class="nav-link" onclick="switchSection('justice')"> <i class="fa-solid fa-scale-balanced" style="color: #f59e0b;"></i> وزارة العدل والقضاء </a></li>
+    <li class="nav-item"><a class="nav-link" onclick="switchSection('finance')"> <i class="fa-solid fa-vault" style="color: #10b981;"></i> وزارة المالية والبطاقات </a></li>
+    <li class="nav-item"><a class="nav-link" onclick="switchSection('gangs')"> <i class="fa-solid fa-skull" style="color: #ef4444;"></i> شبكة العصابات (DarkWeb) </a></li>
+   </ul>
+  </aside>
+  <!-- Top Navigation Header -->
+  <header>
+   <div class="nav-left">
+    <button class="menu-btn" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i> <span style="font-size:1rem; font-weight:bold;">الأقسام</span></button>
+    <div class="brand-container">
+     <span class="brand-title">North Town NTRP</span> <span class="brand-subtitle">نظام إدارة السيرفر الرسمي</span>
+    </div>
+   </div>
+   <div class="user-status">
+    <div class="status-dot"></div>
+    <span id="global-login-status">لم يتم تسجيل الدخول بهوية</span>
+   </div>
+  </header>
+  <!-- Main Dynamic Content -->
+  <main>
+   <!-- SECTION 1: HOME & IDENTITY SYSTEM (أنظمة الهوية الوطنية) -->
+   <section id="sec-home" class="section-panel active">
+    <div class="server-banner">
+     <span>سيرفر نورث تاون المعتمد</span> <span class="server-tag">North Town NTRP</span>
+    </div>
+    <div class="dash-header">
+     <div>
+      <h1>نظام الهويات الوطنية والسجل السكاني</h1>
+      <p style="color: var(--text-muted); margin-top:5px;">سجل دخولك أو أنشئ هويتك للوصول الكامل لكافة الأقسام (يتم حفظ البيانات تلقائياً)</p>
+     </div>
+    </div>
+    <!-- IDENTITY SYSTEM SELECTION -->
+    <div class="auth-card" style="max-width: 600px;">
+     <div class="identity-toggle">
+      <button class="toggle-btn active" id="btn-toggle-create" onclick="toggleIdentityMode('create')"><i class="fa-solid fa-id-card-clip"></i> إنشاء هوية جديدة</button>
+      <button class="toggle-btn" id="btn-toggle-login" onclick="toggleIdentityMode('login')"><i class="fa-solid fa-right-to-bracket"></i> تسجيل الدخول بهوية</button>
+     </div>
+     <!-- FORM 1: CREATE IDENTITY -->
+     <div id="form-identity-create">
+      <h3 style="color:var(--accent-blue); margin-bottom:1rem;"><i class="fa-solid fa-user-plus"></i> إنشاء هوية مدنية جديدة</h3>
+      <div class="form-group">
+       <label>الاسم الرباعي</label> <input type="text" id="id-fullname" class="form-control" placeholder="أدخل اسمك الكامل...">
+      </div>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+       <div class="form-group">
+        <label>تاريخ الميلاد</label> <input type="date" id="id-dob" class="form-control">
+       </div>
+       <div class="form-group">
+        <label>الوظيفة المدنية / الوزارة</label> <select id="id-job" class="form-control"> <option value="مواطن">مواطن عادي / قطاع خاص</option> <option value="وزارة العدل">موظف بوزارة العدل</option> <option value="وزارة المالية">موظف بوزارة المالية</option> <option value="وزارة الداخلية">عسكري بوزارة الداخلية</option> <option value="الاستخبارات الوطنية">عضو بالاستخبارات الوطنية</option> </select>
+       </div>
+      </div>
+      <div class="form-group">
+       <label>بصمة الأصبع (رمز أوتوماتيكي للتعرف)</label> <input type="text" id="id-fingerprint" class="form-control" readonly style="background:#0b1120; font-family:monospace; color:var(--accent-gold);">
+      </div>
+      <button class="btn btn-success" onclick="createNewIdentity()">إصدار الهوية وتفعيل تسجيل الدخول</button>
+     </div>
+     <!-- FORM 2: LOGIN IDENTITY -->
+     <div id="form-identity-login" style="display:none;">
+      <h3 style="color:var(--accent-green); margin-bottom:1rem;"><i class="fa-solid fa-id-badge"></i> تسجيل الدخول بالهوية</h3>
+      <div class="form-group">
+       <label>رقم الهوية الوطنية</label> <input type="text" id="login-id-num" class="form-control" placeholder="أدخل رقم هوياك المكون من 10 أرقام...">
+      </div>
+      <button class="btn" onclick="loginCitizenIdentity()">تسجيل الدخول للهوية</button>
+     </div>
+    </div>
+    <!-- ACTIVE IDENTITY CARD DISPLAY -->
+    <div id="active-citizen-card" class="table-container" style="padding:1.5rem; display:none; border-right: 4px solid var(--accent-green);">
+     <h3><i class="fa-solid fa-address-card" style="color:var(--accent-green);"></i> بطاقة الهوية الوطنية المسجلة حالياً</h3>
+     <div id="citizen-card-details" class="sys-card" style="margin-top:1rem;"></div>
+    </div>
+    <!-- MADE BY NT FOOTER IN HOME PAGE -->
+    <div class="made-by-nt-badge">
+     <i class="fa-solid fa-code"></i> صنع في NT | North Town NTRP
+    </div>
+   </section>
+
+   <!-- SECTION: INTEGRATED NATIONAL INTELLIGENCE (الاستخبارات الوطنية) -->
+   <section id="sec-bureau" class="section-panel">
+    <div class="server-banner">
+     <span>سيرفر نورث تاون المعتمد</span> <span class="server-tag">National Intelligence - DNI</span>
+    </div>
+
+    <!-- ENTRY LAUNCH CARD & LOGIN OVERLAY -->
+    <div id="fedBureauLauncherCard" class="auth-card border-amber-500/40 relative overflow-hidden" style="max-width: 650px;">
+        <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-amber-500/10 border border-amber-500/30 mb-4 text-amber-500 text-3xl">
+            <i class="fa-solid fa-building-shield"></i>
+        </div>
+        <h2 class="text-2xl font-black text-amber-400">الاستخبارات الوطنية (DNI System)</h2>
+        <p class="text-xs text-gray-400 mt-1">المنظومة الاستخباراتية المشفرة والموحدة للقطاعات (FBI, CIA, IAA)</p>
+        
+        <div class="my-6 p-4 bg-slate-950 border border-amber-500/20 rounded-xl text-right text-xs space-y-2">
+            <div class="text-amber-400 font-bold mb-1"><i class="fa-solid fa-shield-halved ml-1"></i> صلاحيات الوصول المشفرة:</div>
+            <div>• <b class="text-amber-400">Agent 0:</b> القيادة العليا للقطاع ورصد العمليات والخزائن.</div>
+            <div>• <b class="text-blue-400">FBI:</b> مكتب التحقيقات الاتحادي.</div>
+            <div>• <b class="text-emerald-400">CIA:</b> وكالة الاستخبارات المركزية.</div>
+            <div>• <b class="text-purple-400">IAA:</b> وكالة العمليات السرية.</div>
+        </div>
+
+        <button onclick="openFederalBureauLogin()" class="btn btn-owner w-full py-3.5 text-base font-bold flex items-center justify-center gap-2">
+            <i class="fa-solid fa-key"></i> فتح منظومة الاستخبارات الوطنية بالكامل
+        </button>
+    </div>
+
+    <!-- INLINE INTEGRATED BUREAU MODULE -->
+    <div id="integratedBureauApp" class="hidden">
+        <!-- LOGIN OVERLAY INTERNAL -->
+        <div id="loginOverlay" class="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-md p-4">
+            <div class="glass-panel p-8 rounded-2xl w-full max-w-md border border-amber-500/30 shadow-2xl relative overflow-hidden">
+                <div class="text-center mb-8">
+                    <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-amber-500/10 border border-amber-500/30 mb-4 text-amber-500 text-3xl">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <h1 class="text-2xl font-black tracking-wide text-white">الاستخبارات الوطنية</h1>
+                    <p class="text-xs text-gray-400 mt-1">بوابة الدخول المشفرة للقطاعات الأمنية الاستخباراتية</p>
+                </div>
+
+                <form onsubmit="handleLogin(event)" class="space-y-5">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 mb-2">رمز الولوج السري:</label>
+                        <div class="relative">
+                            <input type="password" id="passcodeInput" required
+                                class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-center text-lg tracking-widest text-amber-400 font-bold focus:outline-none focus:border-amber-500"
+                                placeholder="••••••••" autocomplete="off">
+                        </div>
+                    </div>
+
+                    <div id="loginError" class="text-rose-500 text-xs text-center hidden font-bold">
+                        <i class="fa-solid fa-circle-exclamation ml-1"></i> الكود السري غير صحيح!
+                    </div>
+
+                    <button type="submit" class="w-full py-3 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-slate-950 font-bold rounded-xl shadow-lg transition">
+                        <i class="fa-solid fa-right-to-bracket ml-2"></i> دخول النظام
+                    </button>
+                    
+                    <button type="button" onclick="closeFederalBureauApp()" class="w-full py-2 bg-slate-800 text-gray-400 text-xs rounded-xl hover:bg-slate-700 transition">
+                        إلغاء والعودة للقائمة الرئيسية
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- MAIN DASHBOARD INTERNAL -->
+        <div id="mainDashboard" class="hidden min-h-screen flex flex-col glass-panel rounded-2xl border border-amber-500/30 overflow-hidden">
+            <header class="glass-panel border-b border-slate-800 px-4 lg:px-8 py-3">
+                <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center text-slate-950 text-2xl shadow-lg font-black">
+                            <i class="fa-solid fa-building-shield"></i>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h1 class="font-black text-lg text-white leading-none">الاستخبارات الوطنية</h1>
+                                <span id="topSystemRoleBadge" class="text-[10px] bg-amber-500/20 text-amber-400 border border-amber-500/40 px-2 py-0.5 rounded font-bold">DNI OVERSEER</span>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-0.5">المنظومة الاستخباراتية الموحدة</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-4">
+                        <div id="userProfileBadge" class="flex items-center gap-3 bg-slate-900/80 border border-slate-700/80 rounded-xl px-4 py-2">
+                            <div class="w-9 h-9 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-lg">
+                                <i class="fa-solid fa-user-gear"></i>
+                            </div>
+                            <div>
+                                <div class="text-xs text-gray-400">الحساب النشط:</div>
+                                <div id="userNameDisplay" class="text-sm font-bold text-amber-400">Agent 0</div>
+                            </div>
+                            <span id="userRoleBadge" class="mr-2 text-[11px] bg-amber-500 text-slate-950 font-bold px-2.5 py-0.5 rounded-full">
+                                مدير الاستخبارات الوطنية
+                            </span>
+                        </div>
+
+                        <button onclick="logout()" class="p-2.5 bg-slate-900 hover:bg-rose-500/20 text-gray-400 hover:text-rose-400 border border-slate-800 hover:border-rose-500/30 rounded-xl transition" title="تسجيل الخروج">
+                            <i class="fa-solid fa-power-off text-base"></i>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <div id="sectorsHeaderBar" class="bg-slate-950 border-b border-slate-800/80 px-4 lg:px-8 py-2">
+                <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                    <div id="fbiHeaderBox" class="flex items-center justify-between bg-blue-950/20 border border-blue-500/20 px-3 py-1.5 rounded-lg">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+                            <span class="font-bold text-blue-400">FBI (مكتب التحقيقات):</span>
+                        </div>
+                        <span id="fbiLeaderDisplay" class="text-gray-300">المسؤول: <span class="text-white font-semibold">غير محدد</span></span>
+                    </div>
+                    <div id="ciaHeaderBox" class="flex items-center justify-between bg-emerald-950/20 border border-emerald-500/20 px-3 py-1.5 rounded-lg">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <span class="font-bold text-emerald-400">CIA (الاستخبارات المركزية):</span>
+                        </div>
+                        <span id="ciaLeaderDisplay" class="text-gray-300">المسؤول: <span class="text-white font-semibold">غير محدد</span></span>
+                    </div>
+                    <div id="iaaHeaderBox" class="flex items-center justify-between bg-purple-950/20 border border-purple-500/20 px-3 py-1.5 rounded-lg">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-purple-500 animate-pulse"></span>
+                            <span class="font-bold text-purple-400">IAA (العمليات السرية):</span>
+                        </div>
+                        <span id="iaaLeaderDisplay" class="text-gray-300">المسؤول: <span class="text-white font-semibold">غير محدد</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TABS -->
+            <div class="bg-slate-900/60 border-b border-slate-800 px-4 lg:px-8 sticky top-0 z-30 backdrop-blur-md">
+                <div class="max-w-7xl mx-auto flex overflow-x-auto no-scrollbar gap-2 py-2">
+                    <button onclick="switchTab('tasks')" id="tabBtn-tasks" class="tab-btn active px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 whitespace-nowrap transition">
+                        <i class="fa-solid fa-list-check"></i> لوحة المهام والتكاليف
+                    </button>
+                    <button onclick="switchTab('org')" id="tabBtn-org" class="tab-btn px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 whitespace-nowrap transition">
+                        <i class="fa-solid fa-sitemap"></i> الهيكلية والأعضاء
+                    </button>
+                    <button onclick="switchTab('treasury')" id="tabBtn-treasury" class="tab-btn px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 whitespace-nowrap transition">
+                        <i class="fa-solid fa-vault"></i> الخزينة والأجهزة الاستخباراتية
+                    </button>
+                    <button onclick="switchTab('reports')" id="tabBtn-reports" class="tab-btn px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 whitespace-nowrap transition">
+                        <i class="fa-solid fa-file-contract"></i> التقارير الميدانية
+                    </button>
+                    <button onclick="switchTab('messages')" id="tabBtn-messages" class="tab-btn px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 whitespace-nowrap transition relative">
+                        <i class="fa-solid fa-comments"></i> الرسائل المشفرة
+                    </button>
+                </div>
+            </div>
+
+            <!-- BUREAU TAB CONTENTS -->
+            <main class="max-w-7xl mx-auto w-full p-4 lg:p-8 flex-grow">
+                <!-- TAB 1: TASKS -->
+                <section id="tab-tasks" class="tab-content space-y-6">
+                    <div id="agent0TaskCreator" class="glass-panel p-6 rounded-2xl border border-amber-500/30 relative">
+                        <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-circle-plus text-amber-500 text-xl"></i>
+                                <h2 class="text-lg font-black text-white">إصدار تكليف استخباراتي جديد (صلاحية Agent 0)</h2>
+                            </div>
+                            <span class="text-xs bg-amber-500/10 text-amber-400 px-3 py-1 rounded-full font-bold border border-amber-500/20">خاص بالقيادة العليا</span>
+                        </div>
+
+                        <form onsubmit="handleCreateTask(event)" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div class="lg:col-span-2">
+                                <label class="block text-xs text-gray-400 mb-1">عنوان المهمة التكليفية:</label>
+                                <input type="text" id="taskTitle" required placeholder="مثال: مراقبة التحركات المشبوهة في الشمال"
+                                    class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">القطاع المستهدف:</label>
+                                <select id="taskTargetSector" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500">
+                                    <option value="ALL">جميع القطاعات (عام)</option>
+                                    <option value="FBI">FBI - مكتب التحقيقات</option>
+                                    <option value="CIA">CIA - الاستخبارات المركزية</option>
+                                    <option value="IAA">IAA - العمليات السرية</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">المكافأة المالية ($):</label>
+                                <input type="number" id="taskReward" required min="1000" step="1000" value="50000"
+                                    class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-amber-400 font-bold focus:outline-none focus:border-amber-500">
+                            </div>
+                            <div class="lg:col-span-3">
+                                <label class="block text-xs text-gray-400 mb-1">تفاصيل ومجريات التكليف:</label>
+                                <textarea id="taskDesc" required rows="2" placeholder="اكتب تفاصيل التكليف، الأهداف المطلوب تحقيقها..."
+                                    class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-amber-500"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">المكافآت الاستثنائية:</label>
+                                <input type="text" id="taskBonus" placeholder="مثال: معدات استخباراتية إضافية"
+                                    class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500">
+                                <button type="submit" class="w-full mt-3 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-sm transition">
+                                    <i class="fa-solid fa-paper-plane ml-1"></i> إرسال التكليف
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-md font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-tasks text-amber-500"></i> قائمة التكاليف الميدانية الموجهة
+                            </h3>
+                            <div id="taskFilterButtons" class="flex gap-2">
+                                <button onclick="filterTasks('ALL')" class="text-xs px-3 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-gray-300">الكل</button>
+                                <button onclick="filterTasks('FBI')" class="text-xs px-3 py-1 bg-blue-900/40 hover:bg-blue-900/60 rounded-lg text-blue-300 border border-blue-500/30">FBI</button>
+                                <button onclick="filterTasks('CIA')" class="text-xs px-3 py-1 bg-emerald-900/40 hover:bg-emerald-900/60 rounded-lg text-emerald-300 border border-emerald-500/30">CIA</button>
+                                <button onclick="filterTasks('IAA')" class="text-xs px-3 py-1 bg-purple-900/40 hover:bg-purple-900/60 rounded-lg text-purple-300 border border-purple-500/30">IAA</button>
+                            </div>
+                        </div>
+
+                        <div id="tasksFeedList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                    </div>
+                </section>
+
+                <!-- TAB 2: ORG -->
+                <section id="tab-org" class="tab-content hidden space-y-6">
+                    <div id="agent0LeaderAssign" class="glass-panel p-6 rounded-2xl border border-amber-500/30">
+                        <h3 class="text-md font-bold text-white mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-user-shield text-amber-500"></i> تعيين رؤوساء القطاعات (خاص بـ Agent 0)
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="bg-slate-950 p-4 rounded-xl border border-blue-500/30">
+                                <div class="text-xs font-bold text-blue-400 mb-2">مسؤول قطاع FBI</div>
+                                <div class="flex gap-2">
+                                    <input type="text" id="fbiLeaderInput" placeholder="اسم المسؤول..." class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2 py-1 text-xs text-white">
+                                    <button onclick="assignLeader('FBI')" class="bg-blue-600 hover:bg-blue-500 text-white text-xs px-3 py-1 rounded-lg font-bold">حفظ</button>
+                                </div>
+                            </div>
+                            <div class="bg-slate-950 p-4 rounded-xl border border-emerald-500/30">
+                                <div class="text-xs font-bold text-emerald-400 mb-2">مسؤول قطاع CIA</div>
+                                <div class="flex gap-2">
+                                    <input type="text" id="ciaLeaderInput" placeholder="اسم المسؤول..." class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2 py-1 text-xs text-white">
+                                    <button onclick="assignLeader('CIA')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-3 py-1 rounded-lg font-bold">حفظ</button>
+                                </div>
+                            </div>
+                            <div class="bg-slate-950 p-4 rounded-xl border border-purple-500/30">
+                                <div class="text-xs font-bold text-purple-400 mb-2">مسؤول قطاع IAA (العمليات السرية)</div>
+                                <div class="flex gap-2">
+                                    <input type="text" id="iaaLeaderInput" placeholder="اسم المسؤول..." class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2 py-1 text-xs text-white">
+                                    <button onclick="assignLeader('IAA')" class="bg-purple-600 hover:bg-purple-500 text-white text-xs px-3 py-1 rounded-lg font-bold">حفظ</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-5 rounded-2xl border border-slate-800">
+                        <h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-user-plus text-amber-500"></i> إضافة أعضاء جديد للقطاع
+                        </h3>
+                        <form onsubmit="handleAddMember(event)" class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                            <input type="text" id="newAgentName" required placeholder="اسم العميل / الكود" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white">
+                            <input type="text" id="newAgentRank" required placeholder="الرتبة / المسمى الوظيفي" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white">
+                            <select id="newAgentSector" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white">
+                                <option value="FBI">FBI - مكتب التحقيقات</option>
+                                <option value="CIA">CIA - الاستخبارات المركزية</option>
+                                <option value="IAA">IAA - العمليات السرية</option>
+                            </select>
+                            <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-2 rounded-xl transition">
+                                <i class="fa-solid fa-plus ml-1"></i> تسجيل العميل
+                            </button>
+                        </form>
+                    </div>
+
+                    <div id="membersOrgGrid" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div id="fbiOrgCard" class="glass-panel rounded-2xl p-5 border border-blue-500/20">
+                            <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-800">
+                                <h4 class="font-bold text-blue-400 flex items-center gap-2">
+                                    <i class="fa-solid fa-building text-blue-500"></i> مكتب التحقيقات FBI
+                                </h4>
+                                <span id="fbiCount" class="text-xs bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded font-mono">0</span>
+                            </div>
+                            <div id="fbiMemberList" class="space-y-2"></div>
+                        </div>
+
+                        <div id="ciaOrgCard" class="glass-panel rounded-2xl p-5 border border-emerald-500/20">
+                            <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-800">
+                                <h4 class="font-bold text-emerald-400 flex items-center gap-2">
+                                    <i class="fa-solid fa-eye text-emerald-500"></i> الاستخبارات المركزية CIA
+                                </h4>
+                                <span id="ciaCount" class="text-xs bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded font-mono">0</span>
+                            </div>
+                            <div id="ciaMemberList" class="space-y-2"></div>
+                        </div>
+
+                        <div id="iaaOrgCard" class="glass-panel rounded-2xl p-5 border border-purple-500/20">
+                            <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-800">
+                                <h4 class="font-bold text-purple-400 flex items-center gap-2">
+                                    <i class="fa-solid fa-user-ninja text-purple-500"></i> IAA (العمليات السرية)
+                                </h4>
+                                <span id="iaaCount" class="text-xs bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded font-mono">0</span>
+                            </div>
+                            <div id="iaaMemberList" class="space-y-2"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TAB 3: TREASURY -->
+                <section id="tab-treasury" class="tab-content hidden space-y-6">
+                    <div id="treasuryCardsContainer" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div id="fbiBudgetCard" class="glass-panel p-5 rounded-2xl border border-blue-500/30 flex items-center justify-between">
+                            <div>
+                                <div class="text-xs text-gray-400 mb-1">ميزانية قطاع FBI</div>
+                                <div id="fbiBudget" class="text-2xl font-black text-blue-400 font-mono">$100,000</div>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-wallet"></i>
+                            </div>
+                        </div>
+                        <div id="ciaBudgetCard" class="glass-panel p-5 rounded-2xl border border-emerald-500/30 flex items-center justify-between">
+                            <div>
+                                <div class="text-xs text-gray-400 mb-1">ميزانية قطاع CIA</div>
+                                <div id="ciaBudget" class="text-2xl font-black text-emerald-400 font-mono">$100,000</div>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-wallet"></i>
+                            </div>
+                        </div>
+                        <div id="iaaBudgetCard" class="glass-panel p-5 rounded-2xl border border-purple-500/30 flex items-center justify-between">
+                            <div>
+                                <div class="text-xs text-gray-400 mb-1">ميزانية IAA (العمليات السرية)</div>
+                                <div id="iaaBudget" class="text-2xl font-black text-purple-400 font-mono">$100,000</div>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-wallet"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="agent0SectorFundSelector" class="glass-panel p-4 rounded-xl flex flex-wrap items-center justify-between border border-slate-800 gap-3">
+                        <div class="text-xs text-gray-300 flex items-center gap-2">
+                            <i class="fa-solid fa-boxes-stacked text-amber-500"></i>
+                            <span>معاينة تقدم مربعات الأجهزة الخاصة بالقطاع:</span>
+                        </div>
+                        <select id="activeFundingSector" onchange="renderMysteryBoxes()" class="bg-slate-950 border border-slate-700 text-amber-400 font-bold text-xs rounded-lg px-3 py-1.5 focus:outline-none">
+                            <option value="FBI">FBI - مكتب التحقيقات</option>
+                            <option value="CIA">CIA - الاستخبارات المركزية</option>
+                            <option value="IAA">IAA - العمليات السرية</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <div class="mb-4">
+                            <h3 class="text-md font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-shield-cat text-amber-500"></i> قائمة الأجهزة الاستخباراتية المشفرة (10 مربعات)
+                            </h3>
+                            <p class="text-xs text-gray-400 mt-1">المربعات مغلقة بالكامل. يتم فتح المربعات بالتتابع عبر رصيد ميزانية القطاع.</p>
+                        </div>
+
+                        <div id="mysteryBoxesGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4"></div>
+                    </div>
+                </section>
+
+                <!-- TAB 4: REPORTS -->
+                <section id="tab-reports" class="tab-content hidden space-y-6">
+                    <div id="sectorReportForm" class="glass-panel p-6 rounded-2xl border border-slate-800">
+                        <h3 class="text-md font-bold text-white mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-file-pen text-amber-500"></i> رفع تقرير ميداني جديد إلى الاستخبارات الوطنية
+                        </h3>
+                        <form onsubmit="handleSubmitReport(event)" class="space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs text-gray-400 mb-1">اسم/عنوان المهمة التكليفية:</label>
+                                    <input type="text" id="reportTaskTitle" required placeholder="مثال: تقرير المتابعة الاستخباراتية"
+                                        class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-gray-400 mb-1">القطاع المرفع للتقرير:</label>
+                                    <input type="text" id="reportSectorDisplay" readonly class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-amber-400 font-bold">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">تفاصيل التتقرير الميداني والأدلة:</label>
+                                <textarea id="reportContent" required rows="3" placeholder="اكتب التفاصيل الكاملة والأدلة والتوصيات..."
+                                    class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-amber-500"></textarea>
+                            </div>
+
+                            <div class="text-left">
+                                <button type="submit" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-6 py-2.5 rounded-xl text-xs transition">
+                                    <i class="fa-solid fa-paper-plane ml-1"></i> إرسال التقرير لـ Agent 0
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div id="agent0ReportsBanner" class="hidden glass-panel p-4 rounded-xl border border-amber-500/30 text-xs text-amber-400 flex items-center gap-3">
+                        <i class="fa-solid fa-eye text-lg"></i>
+                        <span>وضع القيادة العليا (Agent 0): استعراض والتحقق من التقارير الواردة من كافة القطاعات.</span>
+                    </div>
+
+                    <div>
+                        <h3 class="text-md font-bold text-white mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-folder-open text-amber-500"></i> التقارير الميدانية المرفوعة
+                        </h3>
+                        <div id="reportsList" class="space-y-3"></div>
+                    </div>
+                </section>
+
+                <!-- TAB 5: MESSAGES -->
+                <section id="tab-messages" class="tab-content hidden space-y-6">
+                    <div class="glass-panel rounded-2xl border border-slate-800 h-[600px] flex flex-col overflow-hidden">
+                        <div class="p-4 bg-slate-950 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-3 h-3 rounded-full bg-emerald-500 animate-ping"></div>
+                                <div>
+                                    <h3 class="font-bold text-white text-sm">منظومة المراسلات التكتيكية المشفرة</h3>
+                                    <p class="text-[10px] text-gray-400">تشفير عالي الأمان لتبادل البرقيات والاستخبارات</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs text-gray-400">نوع الرسالة / الوجهة:</span>
+                                <select id="chatMessageTypeSelect" class="bg-slate-900 border border-slate-700 text-amber-400 font-bold text-xs rounded-lg px-3 py-1.5 focus:outline-none">
+                                    <option value="BROADCAST">1. رسالة عامة إلى جميع القطاعات</option>
+                                    <option value="DIRECT_FBI">2. برقية موجهة إلى قطاع FBI</option>
+                                    <option value="DIRECT_CIA">2. برقية موجهة إلى قطاع CIA</option>
+                                    <option value="DIRECT_IAA">2. برقية موجهة إلى قطاع IAA (العمليات السرية)</option>
+                                    <option value="FED_DIRECT">3. برقية حصرية إلى الاستخبارات الوطنية (Agent 0)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="chatMessagesContainer" class="flex-grow p-4 overflow-y-auto space-y-3 bg-slate-950/60"></div>
+
+                        <form onsubmit="handleSendMessage(event)" class="p-3 bg-slate-950 border-t border-slate-800 flex gap-2">
+                            <input type="text" id="chatInput" required placeholder="اكتب برقيتك المشفرة هنا..."
+                                class="flex-grow bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500">
+                            <button type="submit" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-5 py-2.5 rounded-xl text-xs transition flex items-center gap-1">
+                                <span>إرسال</span>
+                                <i class="fa-solid fa-paper-plane"></i>
+                            </button>
+                        </form>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+   </section>
+
+   <!-- SECTION 2: INTERIOR MINISTRY SYSTEM -->
+   <section id="sec-interior" class="section-panel">
+    <div class="server-banner">
+     <span>سيرفر نورث تاون المعتمد</span> <span class="server-tag">North Town NTRP</span>
+    </div>
+    <!-- AUTH CARD -->
+    <div id="interior-auth" class="auth-card">
+     <i class="fa-solid fa-shield-halved" style="font-size:3.5rem; color:var(--accent-blue); margin-bottom:1rem;"></i>
+     <h2>وزارة الداخلية | تسجيل الدخول</h2>
+     <p>أدخل الكود العسكري والرمز الوظيفي للوصول لنظام وزارة الداخلية</p>
+     <div class="form-group">
+      <label>الكود العسكري</label> <input type="text" id="int-code" class="form-control" placeholder="أدخل الكود العسكري...">
+     </div>
+     <div class="form-group">
+      <label>الرمز الوظيفي (4 أرقام)</label> <input type="password" id="int-pass" class="form-control" placeholder="أدخل الرمز السرّي...">
+     </div>
+     <button class="btn" onclick="loginInterior()">تسجيل الدخول للنظام</button>
+    </div>
+    <!-- DASHBOARD DISPLAY -->
+    <div id="interior-dash" style="display:none;">
+     <div class="dash-header">
+      <div>
+       <h2><i class="fa-solid fa-shield-halved"></i> المنظومة المتكاملة لوزارة الداخلية</h2>
+       <p id="int-welcome-text" style="color:var(--text-muted); margin-top:5px;"></p>
+      </div>
+      <button class="btn btn-danger" style="width:auto; padding: 0.5rem 1.2rem; margin:0;" onclick="logoutInterior()">تسجيل الخروج</button>
+     </div>
+     <!-- DEPARTMENT VAULT DISPLAY -->
+     <div class="stats-grid">
+      <div class="stat-card">
+       <div class="stat-icon" style="background:rgba(59, 130, 246, 0.2); color:var(--accent-blue);">
+        <i class="fa-solid fa-vault"></i>
+       </div>
+       <div>
+        <h3 id="interior-vault-display">$500,000</h3>
+        <p style="color:var(--text-muted); font-size:0.85rem;">خزينة وزارة الداخلية المستقلة</p>
+       </div>
+      </div>
+     </div>
+     <!-- ADMIN RECRUITMENT PANEL -->
+     <div id="recruitment-panel" class="table-container" style="padding:1.5rem; border-right: 4px solid var(--accent-gold); display:none;">
+      <h3><i class="fa-solid fa-user-plus" style="color:var(--accent-gold);"></i> لوحة توظيف وتكليف الكادر العسكري (القيادة العليا)</h3>
+      <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:1rem;">قم بتسجيل العسكري الجديد وإدخال رتبته وكوده ورمزه الوظيفي.</p>
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;">
+       <div>
+        <label style="font-size:0.8rem; color:var(--text-muted);">اسم الضابط/الفرد</label> <input type="text" id="new-off-name" class="form-control" placeholder="الاسم الكامل">
+       </div>
+       <div>
+        <label style="font-size:0.8rem; color:var(--text-muted);">الكود العسكري</label> <input type="text" id="new-off-code" class="form-control" placeholder="مثال: POL-102">
+       </div>
+       <div>
+        <label style="font-size:0.8rem; color:var(--text-muted);">الرمز الوظيفي (4 أرقام)</label> <input type="text" id="new-off-pin" maxlength="4" class="form-control" placeholder="مثال: 1234">
+       </div>
+       <div>
+        <label style="font-size:0.8rem; color:var(--text-muted);">الرتبة العسكرية</label> <select id="new-off-rank" class="form-control"> <optgroup label="الضباط"> <option value="فريق اول">فريق أول (قيادة عليا)</option> <option value="فريق">فريق</option> <option value="لواء">لواء</option> <option value="عميد">عميد</option> <option value="عقيد">عقيد</option> <option value="مقدم">مقدم</option> <option value="رائد">رائد</option> <option value="نقيب">نقيب</option> <option value="ملازم اول">ملازم أول</option> <option value="ملازم">ملازم</option> </optgroup> <optgroup label="الأفراد"> <option value="رئيس رقباء">رئيس رقباء</option> <option value="رقيب اول">رقيب أول</option> <option value="رقيب">رقيب</option> <option value="وكيل رقيب">وكيل رقيب</option> <option value="عريف">عريف</option> <option value="جندي اول">جندي أول</option> <option value="جندي">جندي</option> </optgroup> </select>
+       </div>
+       <div style="display:flex; align-items:flex-end;">
+        <button class="btn btn-success" style="margin:0; height:42px;" onclick="hireNewOfficer()">إصدار قرار توظيف</button>
+       </div>
+      </div>
+     </div>
+     <!-- SYSTEMS NAVIGATION TABS -->
+     <div style="display:flex; gap:10px; margin-bottom:1.5rem; flex-wrap:wrap;">
+      <button class="btn" style="width:auto; margin:0;" onclick="switchInteriorSys('search')"><i class="fa-solid fa-laptop-code"></i> نظام الاستعلام والتتبع</button>
+      <button class="btn" style="width:auto; margin:0; background:var(--bg-hover);" onclick="switchInteriorSys('dispatch')"><i class="fa-solid fa-headset"></i> مركز البلاغات (999)</button>
+      <button class="btn" style="width:auto; margin:0; background:var(--bg-hover);" onclick="switchInteriorSys('fines')"><i class="fa-solid fa-file-invoice-dollar"></i> المخالفات</button>
+      <button class="btn" style="width:auto; margin:0; background:var(--bg-hover);" onclick="switchInteriorSys('weapons')"><i class="fa-solid fa-gun"></i> تراخيص الأسلحة</button>
+      <button class="btn" style="width:auto; margin:0; background:var(--bg-hover);" onclick="switchInteriorSys('warrants')"><i class="fa-solid fa-gavel"></i> المذكرات والجنايات</button>
+      <button id="tab-roster-btn" class="btn" style="width:auto; margin:0; background:var(--bg-hover); display:none;" onclick="switchInteriorSys('roster')"><i class="fa-solid fa-users-gear"></i> سجل الكادر</button>
+     </div>
+     <!-- SYSTEM 1: INQUIRIES & SEARCH -->
+     <div id="sys-search" class="table-container" style="padding:1.5rem;">
+      <h3><i class="fa-solid fa-magnifying-glass" style="color:var(--accent-blue);"></i> نظام الاستعلام عن المواطنين والمركبات</h3>
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:1.5rem; margin-top:1rem;">
+       <div style="background:var(--bg-dark); padding:1rem; border-radius:8px; border:1px solid var(--border-color);">
+        <h4><i class="fa-solid fa-id-card"></i> الاستعلام عن مواطن / هوية</h4>
+        <div style="display:flex; gap:10px; margin-top:10px;">
+         <input type="text" id="search-citizen-input" class="form-control" placeholder="أدخل اسم المواطن أو رقم الهوية...">
+         <button class="btn" style="width:100px; margin:0;" onclick="searchCitizen()">بحث</button>
+        </div>
+        <div id="citizen-result" class="sys-card" style="display:none;"></div>
+       </div>
+       <div style="background:var(--bg-dark); padding:1rem; border-radius:8px; border:1px solid var(--border-color);">
+        <h4><i class="fa-solid fa-car"></i> الاستعلام عن لوحة مركبة</h4>
+        <div style="display:flex; gap:10px; margin-top:10px;">
+         <input type="text" id="search-plate-input" class="form-control" placeholder="أدخل رقم اللوحة...">
+         <button class="btn" style="width:100px; margin:0;" onclick="searchVehicle()">بحث</button>
+        </div>
+        <div id="vehicle-result" class="sys-card" style="display:none;"></div>
+       </div>
+      </div>
+     </div>
+     <!-- SYSTEM 2: DISPATCH -->
+     <div id="sys-dispatch" class="table-container" style="padding:1.5rem; display:none;">
+      <h3><i class="fa-solid fa-headset" style="color:var(--accent-green);"></i> نظام غرفة العمليات الميدانية (999)</h3>
+      <table>
+       <thead>
+        <tr>
+         <th>رقم البلاغ</th>
+         <th>المُبلّغ</th>
+         <th>موقع البلاغ</th>
+         <th>نوع البلاغ</th>
+         <th>الدورية الموجهة</th>
+         <th>الإجراء</th>
+        </tr>
+       </thead>
+       <tbody>
+        <tr>
+         <td>#901</td>
+         <td>مواطن خافر</td>
+         <td>طريق الملك فهد</td>
+         <td>حادث سير وهروب</td>
+         <td><span style="color:var(--accent-gold);">الدورية A-12</span></td>
+         <td>
+          <button class="btn btn-success" style="padding:0.3rem 0.8rem; margin:0; font-size:0.8rem;" onclick="alert('تم توجيه أقرب دورية ومتابعة البلاغ!')">قبول وتوجيه</button>
+         </td>
+        </tr>
+       </tbody>
+      </table>
+     </div>
+     <!-- SYSTEM 3: FINES -->
+     <div id="sys-fines" class="table-container" style="padding:1.5rem; display:none;">
+      <h3><i class="fa-solid fa-file-invoice-dollar" style="color:var(--accent-gold);"></i> نظام تحرير المخالفات وحجز المركبات</h3>
+      <div style="margin-top:1rem; background:var(--bg-dark); padding:1rem; border-radius:8px; border:1px solid var(--border-color);">
+       <h4>اصدار مخالفة مرورية / أمنية جديدة</h4>
+       <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:10px; margin-top:10px;">
+        <input type="text" id="fine-citizen" class="form-control" placeholder="اسم المخالف / الهوية"> <input type="text" id="fine-type" class="form-control" placeholder="نوع المخالفة (قطع إشارة/تفحيط)"> <input type="number" id="fine-amount" class="form-control" placeholder="قيمة الغرامة ($)">
+        <button class="btn btn-success" style="margin:0; height:42px;" onclick="addFine()">تسجيل المخالفة</button>
+       </div>
+      </div>
+      <div id="fines-list" style="margin-top:1.5rem;">
+       <h4>سجل المخالفات المسجلة مؤخراً</h4>
+      </div>
+     </div>
+     <!-- SYSTEM 4: WEAPONS LICENSING -->
+     <div id="sys-weapons" class="table-container" style="padding:1.5rem; display:none;">
+      <h3><i class="fa-solid fa-gun" style="color:var(--accent-purple);"></i> نظام إصدار والتحقق من تراخيص الأسلحة</h3>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1.5rem; margin-top:1rem;">
+       <div style="background:var(--bg-dark); padding:1rem; border-radius:8px; border:1px solid var(--border-color);">
+        <h4>إصدار ترخيص سلاح رسمي</h4>
+        <div style="margin-top:10px; display:flex; flex-direction:column; gap:10px;">
+         <input type="text" id="weap-owner" class="form-control" placeholder="اسم المالك المعتمد"> <input type="text" id="weap-serial" class="form-control" placeholder="الرقم التسلسلي للسلاح"> <select id="weap-type" class="form-control"> <option>مسدس خفيف (Pistol)</option> <option>رشاش شخصي (SMG)</option> <option>بندقية صيد</option> </select>
+         <button class="btn" style="margin:0; background:var(--accent-purple);" onclick="issueWeaponLicense()">اعتماد الترخيص</button>
+        </div>
+       </div>
+       <div style="background:var(--bg-dark); padding:1rem; border-radius:8px; border:1px solid var(--border-color);">
+        <h4>التأكد من سريان ترخيص سلاح</h4>
+        <div style="margin-top:10px; display:flex; gap:10px;">
+         <input type="text" id="check-serial" class="form-control" placeholder="أدخل الرقم التسلسلي...">
+         <button class="btn" style="width:100px; margin:0;" onclick="checkWeapon()">تحقق</button>
+        </div>
+        <div id="weapon-check-result" class="sys-card" style="display:none;"></div>
+       </div>
+      </div>
+     </div>
+     <!-- SYSTEM 5: WARRANTS -->
+     <div id="sys-warrants" class="table-container" style="padding:1.5rem; display:none;">
+      <h3><i class="fa-solid fa-gavel" style="color:var(--accent-red);"></i> نظام الجنايات ومذكرات الإيقاف والقبض</h3>
+      <div style="margin-top:1rem; background:var(--bg-dark); padding:1rem; border-radius:8px; border:1px solid var(--border-color);">
+       <h4>تحرير بلاغ قضائي / أمر قبض</h4>
+       <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
+        <input type="text" id="inc-target" class="form-control" placeholder="اسم المشتبه به"> <input type="text" id="inc-title" class="form-control" placeholder="عنوان التهمة والجريمة">
+       </div>
+       <textarea id="inc-details" class="form-control" style="margin-top:10px; height:80px;" placeholder="تفاصيل الحادث والأدلة المضبوطة..."></textarea>
+       <button class="btn btn-danger" style="margin-top:10px;" onclick="submitIncident()">تثبيت التهمة وإصدار أمر قبض</button>
+      </div>
+      <div style="margin-top:1.5rem;">
+       <h4>سجل القضايا والمذكرات الأمنية المعتمدة</h4>
+       <div id="incidents-list" style="margin-top:10px;"></div>
+      </div>
+     </div>
+     <!-- SYSTEM 6: OFFICERS ROSTER -->
+     <div id="sys-roster" class="table-container" style="display:none;">
+      <h3 style="padding:1rem 1.5rem; background:rgba(255,255,255,0.02);"><i class="fa-solid fa-address-book"></i> سجل الكادر العسكري لوزارة الداخلية</h3>
+      <table>
+       <thead>
+        <tr>
+         <th>الاسم</th>
+         <th>الكود العسكري</th>
+         <th>الرمز الوظيفي (خاص بالقيادة)</th>
+         <th>الرتبة</th>
+         <th>الفئة</th>
+         <th>الحالة</th>
+        </tr>
+       </thead>
+       <tbody id="roster-table-body"></tbody>
+      </table>
+     </div>
+    </div>
+   </section>
+
+   <!-- SECTION 4: JUSTICE MINISTRY SYSTEM -->
+   <section id="sec-justice" class="section-panel">
+    <div class="server-banner">
+     <span>سيرفر نورث تاون المعتمد</span> <span class="server-tag">North Town NTRP</span>
+    </div>
+    <div class="dash-header" style="border-right: 4px solid var(--accent-gold);">
+     <div>
+      <h2><i class="fa-solid fa-scale-balanced"></i> وزارة العدل والقضاء</h2>
+      <p style="color:var(--text-muted);">بوابة المعاملات العدلية والأحكام القضائية</p>
+     </div>
+    </div>
+    <!-- DEPARTMENT VAULT DISPLAY -->
+    <div id="justice-staff-vault" class="stats-grid" style="display:none;">
+     <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(245, 158, 11, 0.2); color:var(--accent-gold);">
+       <i class="fa-solid fa-vault"></i>
+      </div>
+      <div>
+       <h3 id="justice-vault-display">$300,000</h3>
+       <p style="color:var(--text-muted); font-size:0.85rem;">خزينة وزارة العدل والقضاء</p>
+      </div>
+     </div>
+    </div>
+    <!-- DISPLAY FOR PUBLIC / NON-JUSTICE EMPLOYEES -->
+    <div id="justice-public-view">
+     <div class="table-container" style="padding:1.5rem; border-right: 4px solid var(--accent-gold);">
+      <h3><i class="fa-solid fa-file-invoice-dollar" style="color:var(--accent-gold);"></i> بوابة تسديد المخالفات المالية والغرامات (وزارة العدل)</h3>
+      <p style="color:var(--text-muted); font-size:0.88rem; margin-top:5px; margin-bottom:1.5rem;">عرض وتصفيات المخالفات المسجلة برقم الهوية الوطنية للمواطن المسجل حالياً.</p>
+      <div id="justice-auto-citizen-fine-card" class="sys-card" style="margin-top:1rem;"></div>
+     </div>
+     <div class="table-container" style="padding:1.5rem;">
+      <h3><i class="fa-solid fa-paper-plane" style="color:var(--accent-gold);"></i> تقديم طلب أو دعوى قضائية إلى وزارة العدل</h3>
+      <p style="color:var(--text-muted); font-size:0.9rem; margin-top:5px; margin-bottom:1.5rem;">يمكنك تقديم دعوى حقوقية، طلب توثيق، أو اعتراض رسمي على مخالفة للدوائر الشرعية.</p>
+      <div style="max-width:600px; display:flex; flex-direction:column; gap:12px;">
+       <div class="form-group">
+        <label>نوع الطلب / المعاملة العدلية</label> <select class="form-control"> <option>اعتراض على مخالفة / غرامة مالية</option> <option>رفع دعوى حقوقية / مالية</option> <option>طلب توثيق عقود وتراخيص</option> <option>استئناف أمر أمني / قضائي</option> </select>
+       </div>
+       <div class="form-group">
+        <label>تفاصيل الطلب والأسباب</label> <textarea class="form-control" style="height:100px;" placeholder="اكتب التفاصيل والمستندات المؤيدة هنا..."></textarea>
+       </div>
+       <button class="btn" style="background:var(--accent-gold); color:black;" onclick="alert('تم رفع طلبك لوزارة العدل بنجاح وتوجيهه إلى القاضي المناظر!')">ارسال الطلب رسمياً</button>
+      </div>
+     </div>
+    </div>
+    <!-- DISPLAY FOR JUSTICE EMPLOYEES ONLY -->
+    <div id="justice-staff-view" style="display:none;">
+     <div class="table-container" style="padding:1.5rem; border-right: 4px solid var(--accent-blue);">
+      <h3 style="color:var(--accent-blue);"><i class="fa-solid fa-magnifying-glass-dollar"></i> نظام الاستعلام والتدقيق المالي (لموظفي العدل)</h3>
+      <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:1rem;">البحث برقم الهوية الوطنية للتحقق من وجود أي مخالفات أو غرامات صادرة بحق المواطن.</p>
+      <div style="display:flex; gap:10px; max-width:600px;">
+       <input type="text" id="staff-search-id-input" class="form-control" placeholder="أدخل رقم الهوية أو الاسم لاستعلام موظف العدل...">
+       <button class="btn" style="background:var(--accent-blue); width:150px; margin:0;" onclick="staffCheckCitizenFines()">استعلام الهوية</button>
+      </div>
+      <div id="staff-fine-result-box" class="sys-card" style="display:none; margin-top:1rem;"></div>
+     </div>
+     <div class="table-container" style="padding:1.5rem;">
+      <h3 style="color:var(--accent-gold);"><i class="fa-solid fa-gavel"></i> لوحة القضاة وتثبيت الأحكام (خاص بموظفي وزارة العدل)</h3>
+      <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:1rem;">الصلاحيات الكاملة لإصدار الأحكام الشرعية، تسجيل السوابق الجنائية، والبت في القضايا.</p>
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top:1rem;">
+       <input type="text" class="form-control" placeholder="اسم المتهم / رقم الهوية"> <input type="text" class="form-control" placeholder="التهمة الموجهة"> <input type="number" class="form-control" placeholder="مدة السجن (بالدقائق)">
+       <button class="btn" style="margin:0; background:var(--accent-gold); color:black;" onclick="alert('تم ثبت الحكم القضائي وتأكيد السجل الجنائي للمواطن!')">تثبيت الحكم</button>
+      </div>
+     </div>
+     <div class="table-container" style="padding:1.5rem;">
+      <h3><i class="fa-solid fa-inbox"></i> قائمة الطلبات والدعاوى الواردة من المواطنين</h3>
+      <div class="sys-card" style="border-right: 4px solid var(--accent-gold);">
+       <b>دعوى مالية #402:</b> مقدمة من المواطن (خالد العتيبي) بخصوص مطالبه بمبلغ $12,000.
+       <br>
+       <button class="btn" style="width:auto; padding:0.4rem 1rem; margin-top:10px; background:var(--accent-gold); color:black;" onclick="alert('تم جلب القضية للإنهاء!')">مراجعة والبت في الدعوى</button>
+      </div>
+     </div>
+    </div>
+   </section>
+
+   <!-- SECTION 5: FINANCE MINISTRY SYSTEM -->
+   <section id="sec-finance" class="section-panel">
+    <div class="server-banner">
+     <span>سيرفر نورث تاون المعتمد</span> <span class="server-tag">North Town NTRP</span>
+    </div>
+    <div class="dash-header" style="border-right: 4px solid var(--accent-green);">
+     <div>
+      <h2><i class="fa-solid fa-vault"></i> وزارة المالية والنظام البنكي المركزي</h2>
+      <p style="color:var(--text-muted);">تحكم كامل بالميزانيات العامة، الخزائن، حسابات المواطنين، والبطاقات</p>
+     </div>
+    </div>
+    <!-- DISPLAY FOR PUBLIC / NON-FINANCE EMPLOYEES -->
+    <div id="finance-public-view">
+     <div class="table-container" style="padding:1.5rem;">
+      <h3><i class="fa-solid fa-credit-card" style="color:var(--accent-green);"></i> محفظة بطاقاتك البنكية والتحويل</h3>
+      <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:1rem;">إدارة بطاقاتك المصرفية المفعلة وإجراء تحويل مالي فورية لأي شخص برقم البطاقة (16 رقم).</p>
+      <button class="btn btn-success" style="width:220px; padding:0.6rem; font-size:0.88rem; margin-bottom:1rem;" onclick="issueNewBankCard()">+ إصدار بطاقة جديدة</button>
+      <div id="finance-cards-full-list" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:1rem;"></div>
+      <div style="margin-top:2rem; background:var(--bg-dark); padding:1.5rem; border-radius:10px; border:1px solid var(--border-color);">
+       <h4 style="color:var(--accent-purple);"><i class="fa-solid fa-money-bill-transfer"></i> تحويل أموال مباشر (برقم البطاقة)</h4>
+       <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:1rem; margin-top:1rem;">
+        <div>
+         <label style="font-size:0.8rem; color:var(--text-muted);">اختر بطاقتك</label> <select id="transfer-source-card-fin" class="form-control"></select>
+        </div>
+        <div>
+         <label style="font-size:0.8rem; color:var(--text-muted);">رقم بطاقة المستلم (16 رقم)</label> <input type="text" id="transfer-target-card-fin" class="form-control" placeholder="**** **** **** ****">
+        </div>
+        <div>
+         <label style="font-size:0.8rem; color:var(--text-muted);">المبلغ ($)</label> <input type="number" id="transfer-amount-fin" class="form-control" placeholder="0">
+        </div>
+        <div style="display:flex; align-items:flex-end;">
+         <button class="btn btn-purple" style="margin:0; height:42px;" onclick="executeCardTransferFin()">تأكيد التحويل الآن</button>
+        </div>
+       </div>
+      </div>
+     </div>
+    </div>
+    <!-- DISPLAY FOR FINANCE EMPLOYEES & MINISTER OF FINANCE -->
+    <div id="finance-staff-view" style="display:none;">
+     <div class="stats-grid">
+      <div class="stat-card">
+       <div class="stat-icon" style="background:rgba(16, 185, 129, 0.2); color:var(--accent-green);">
+        <i class="fa-solid fa-sack-dollar"></i>
+       </div>
+       <div>
+        <h3 id="fin-stat-main">$2,450,900</h3>
+        <p style="color:var(--text-muted); font-size:0.85rem;">الخزينة العامة للدولة</p>
+       </div>
+      </div>
+      <div class="stat-card">
+       <div class="stat-icon" style="background:rgba(59, 130, 246, 0.2); color:var(--accent-blue);">
+        <i class="fa-solid fa-shield-halved"></i>
+       </div>
+       <div>
+        <h3 id="fin-stat-interior">$500,000</h3>
+        <p style="color:var(--text-muted); font-size:0.85rem;">خزينة الداخلية</p>
+       </div>
+      </div>
+      <div class="stat-card">
+       <div class="stat-icon" style="background:rgba(139, 92, 246, 0.2); color:var(--accent-purple);">
+        <i class="fa-solid fa-user-secret"></i>
+       </div>
+       <div>
+        <h3 id="fin-stat-intel">$750,000</h3>
+        <p style="color:var(--text-muted); font-size:0.85rem;">خزينة الاستخبارات</p>
+       </div>
+      </div>
+      <div class="stat-card">
+       <div class="stat-icon" style="background:rgba(245, 158, 11, 0.2); color:var(--accent-gold);">
+        <i class="fa-solid fa-scale-balanced"></i>
+       </div>
+       <div>
+        <h3 id="fin-stat-justice">$300,000</h3>
+        <p style="color:var(--text-muted); font-size:0.85rem;">خزينة العدل</p>
+       </div>
+      </div>
+     </div>
+     <div class="table-container" style="padding:1.5rem; border-right: 4px solid var(--accent-green);">
+      <h3><i class="fa-solid fa-building-columns" style="color:var(--accent-green);"></i> التحكم الكامل لوزير المالية بخزائن وميزانيات القطاعات</h3>
+      <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:1rem;">إمكانية تحويل أموال مباشرة من الخزينة العامة إلى أي خزينة قطاع أو استردادها فوراً.</p>
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top:1rem;">
+       <div>
+        <label style="font-size:0.8rem; color:var(--text-muted);">القطاع/الجهة</label> <select id="fin-target-dept" class="form-control"> <option value="interior">وزارة الداخلية</option> <option value="intel">الاستخبارات الوطنية</option> <option value="justice">وزارة العدل</option> </select>
+       </div>
+       <div>
+        <label style="font-size:0.8rem; color:var(--text-muted);">المبلغ ($)</label> <input type="number" id="fin-transfer-amount" class="form-control" placeholder="0">
+       </div>
+       <div>
+        <label style="font-size:0.8rem; color:var(--text-muted);">نوع العملية المالية</label> <select id="fin-transfer-action" class="form-control"> <option value="fund">تمويل/صرف ميزانية (تحويل للقطاع)</option> <option value="reclaim">استرداد أموال (سحب للخزينة العامة)</option> </select>
+       </div>
+       <div style="display:flex; align-items:flex-end;">
+        <button class="btn btn-success" style="margin:0; height:42px;" onclick="executeMinisterFinanceAction()">تنفيذ الإجراء المالي</button>
+       </div>
+      </div>
+     </div>
+     <div class="table-container" style="padding:1.5rem; border-right: 4px solid var(--accent-purple);">
+      <h3 style="color:var(--accent-purple);"><i class="fa-solid fa-id-card-clip"></i> التحكم المالي المباشر لوزير المالية بحسابات المواطنين (عن طريق الهوية)</h3>
+      <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:1rem;">إضافة أو خصم أموال لأي مواطن عن طريق رقم الهوية، أو تجميد/فك تجميد حسابه المصرفي بالكامل.</p>
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:1rem; margin-top:1rem;">
+       <div>
+        <label style="font-size:0.8rem; color:var(--text-muted);">رقم الهوية الوطنية للمواطن</label> <input type="text" id="fin-cit-id-input" class="form-control" placeholder="أدخل رقم الهوية (10 أرقام)...">
+       </div>
+       <div>
+        <label style="font-size:0.8rem; color:var(--text-muted);">المبلغ ($)</label> <input type="number" id="fin-cit-money-amount" class="form-control" placeholder="0">
+       </div>
+       <div>
+        <label style="font-size:0.8rem; color:var(--text-muted);">الإجراء المطلوبة</label> <select id="fin-cit-action" class="form-control"> <option value="add">إضافة أموال للمواطن (+)</option> <option value="deduct">خصم / مصادرة أموال (-)</option> <option value="freeze">تجميد الحساب البنكي والبطاقات ❄️</option> <option value="unfreeze">فك تجميد الحساب البنكي 🔓</option> </select>
+       </div>
+       <div style="display:flex; align-items:flex-end;">
+        <button class="btn btn-purple" style="margin:0; height:42px;" onclick="executeMinisterCitizenMoneyControl()">تطبيق الإجراء المالي</button>
+       </div>
+      </div>
+     </div>
+    </div>
+   </section>
+
+   <!-- SECTION 6: GANGS & MAFIA SYSTEM -->
+   <section id="sec-gangs" class="section-panel">
+    <div class="server-banner">
+     <span>سيرفر نورث تاون المعتمد</span> <span class="server-tag">North Town NTRP</span>
+    </div>
+    <!-- GANG AUTHENTICATION CARD -->
+    <div id="gang-auth-card" class="auth-card" style="border-color:var(--accent-red);">
+     <i class="fa-solid fa-mask" style="font-size:3.5rem; color:var(--accent-red); margin-bottom:1rem;"></i>
+     <h2 style="color:var(--accent-red);">شبكة المافيا والعصابات المشفرة (DarkNet)</h2>
+     <p>أدخل كلمة مرور العصابة أو منظومة المافيا للوصول للوحة الخاصة</p>
+     <div class="form-group">
+      <label>كلمة السر الخاصة بالعصابة / المافيا</label> <input type="password" id="gang-password-input" class="form-control" placeholder="أدخل كلمة المرور الخاصة بمنظومتك...">
+     </div>
+     <button class="btn btn-danger" onclick="loginGangNetwork()">فك التشفير والدخول</button>
+    </div>
+    <!-- GANG DASHBOARD DISPLAY -->
+    <div id="gang-dash-board" style="display:none;">
+     <div class="dash-header" style="border-right: 4px solid var(--accent-red); background:#18181b;">
+      <div>
+       <h2 id="gang-portal-title" style="color:var(--accent-red);"><i class="fa-solid fa-skull"></i> لوحة العصابة</h2>
+       <p style="color:var(--text-muted); margin-top:4px;">إدارة الخزينة المالية، المقر الأمني، السرقات، والمهام المافياوية</p>
+      </div>
+      <button class="btn btn-danger" style="width:auto; padding:0.5rem 1.2rem; margin:0;" onclick="logoutGangNetwork()">تسجيل الخروج</button>
+     </div>
+     <div class="stats-grid">
+      <div class="stat-card">
+       <div class="stat-icon" style="background:rgba(239, 68, 68, 0.2); color:var(--accent-red);">
+        <i class="fa-solid fa-sack-dollar"></i>
+       </div>
+       <div>
+        <h3 id="gang-money-vault-disp">$0</h3>
+        <p style="color:var(--text-muted); font-size:0.85rem;">خزينة الأموال المستقلة</p>
+       </div>
+      </div>
+      <div class="stat-card">
+       <div class="stat-icon" style="background:rgba(245, 158, 11, 0.2); color:var(--accent-gold);">
+        <i class="fa-solid fa-gun"></i>
+       </div>
+       <div>
+        <h3 id="gang-weapons-count-disp">0 قطعة</h3>
+        <p style="color:var(--text-muted); font-size:0.85rem;">خزينة الأسلحة والعتاد</p>
+       </div>
+      </div>
+      <div class="stat-card">
+       <div class="stat-icon" style="background:rgba(139, 92, 246, 0.2); color:var(--accent-purple);">
+        <i class="fa-solid fa-star"></i>
+       </div>
+       <div>
+        <h3 id="gang-points-disp">0 نقطة</h3>
+        <p style="color:var(--text-muted); font-size:0.85rem;">نقاط الهيبة والسيطرة</p>
+       </div>
+      </div>
+     </div>
+     <div id="gang-robbery-system-panel" class="table-container" style="padding:1.5rem; border-right: 4px solid var(--accent-red);">
+      <h3 style="color:var(--accent-red);"><i class="fa-solid fa-mask"></i> نظام السرقات الميدانية والتحديات (Robbery System)</h3>
+      <p style="color:var(--text-muted); font-size:0.88rem; margin-bottom:1.5rem;">اختر العملية الميدانية، واجتز تحدي الميني جيم (Minigame) لتجني الأموال والنقاط لخزينة عصابتك.</p>
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:1.5rem;">
+       <div class="sys-card" style="border-right: 3px solid var(--accent-green);">
+        <h4 style="color:var(--accent-green);"><i class="fa-solid fa-store"></i> 1. سرقة بقالة (سطو سريع)</h4>
+        <p style="font-size:0.85rem; color:var(--text-muted); margin:8px 0;">الأرباح: $3,000 + 15 نقطة | فترة التهدئة: 60 ثانية.</p>
+        <button id="btn-rob-grocery" class="btn btn-success" style="margin:0;" onclick="startRobberyMinigame('بقالة', 3000, 15)">بدء سرقة البقالة</button>
+       </div>
+       <div class="sys-card" style="border-right: 3px solid var(--accent-gold);">
+        <h4 style="color:var(--accent-gold);"><i class="fa-solid fa-house-crack"></i> 2. سرقة بيت (اقتحام كبير)</h4>
+        <p style="font-size:0.85rem; color:var(--text-muted); margin:8px 0;">الأرباح: $15,000 + 60 نقطة | فترة التهدئة: 60 ثانية.</p>
+        <button id="btn-rob-house" class="btn" style="background:var(--accent-gold); color:black; margin:0;" onclick="startRobberyMinigame('بيت', 15000, 60)">بدء اقتحام البيت</button>
+       </div>
+       <div class="sys-card" style="border-right: 3px solid var(--accent-purple);">
+        <h4 style="color:var(--accent-purple);"><i class="fa-solid fa-credit-card"></i> 3. سرقة صرافة (تهكير وتفجير)</h4>
+        <p style="font-size:0.85rem; color:var(--text-muted); margin:8px 0;">الأرباح: $8,000 + 35 نقطة | فترة التهدئة: 60 ثانية.</p>
+        <button id="btn-rob-atm" class="btn btn-purple" style="margin:0;" onclick="startRobberyMinigame('صرافة', 8000, 35)">بدء تفجير الصرافة</button>
+       </div>
+      </div>
+      <div id="minigame-box" class="sys-card" style="display:none; margin-top:1.5rem; background:#0b1120; border:2px dashed var(--accent-gold); text-align:center; padding:1.5rem;">
+       <h3 style="color:var(--accent-gold);"><i class="fa-solid fa-lock-open"></i> تحدي فك قفل الخزنة التفاعلي (Interactive Lockpick)</h3>
+       <p id="minigame-instructions" style="margin:10px 0; font-size:0.9rem; color:var(--text-muted);">اضغط زر "إيقاف القفل" عندما يقف المؤشر التفاعلي بالضبط داخل المنطقة الخضراء!</p>
+       <div style="position:relative; width:100%; max-width:450px; height:35px; background:#1e293b; border-radius:20px; margin:20px auto; overflow:hidden; border:2px solid var(--border-color);">
+        <div id="minigame-target-zone" style="position:absolute; top:0; bottom:0; left:40%; width:20%; background:rgba(16, 185, 129, 0.4); border-left:2px solid var(--accent-green); border-right:2px solid var(--accent-green);"></div>
+        <div id="minigame-pin" style="position:absolute; top:0; bottom:0; left:0%; width:8px; background:var(--accent-gold); box-shadow:0 0 10px var(--accent-gold);"></div>
+       </div>
+       <button id="btn-stop-lockpick" class="btn btn-success" style="width:200px; margin:10px auto; font-size:1.1rem;" onclick="stopLockpickMinigame()">إيقاف القفل الآن! 🔓</button>
+      </div>
+     </div>
+     <div id="mafia-assign-panel" class="table-container" style="padding:1.5rem; border-right: 4px solid var(--accent-purple); display:none;">
+      <h3 style="color:var(--accent-purple);"><i class="fa-solid fa-crown"></i> لوحة السيطرة المطلقة للمافيا الروسية (Absolute Mafia Dominance)</h3>
+      <p style="color:var(--text-muted); font-size:0.88rem; margin-bottom:1.5rem;">تحكم كامل وناقذ بكافة العصابات: إضافة/خصم النقاط، إضافة/سحب الأسلحة، تحويل مالي مباشر للخزائن، وتوجيه المهام.</p>
+      <div style="background:#0b1120; border:1px solid var(--accent-purple); border-radius:8px; padding:1.2rem; margin-bottom:1.5rem;">
+       <h4 style="color:var(--accent-gold); margin-bottom:10px;"><i class="fa-solid fa-sliders"></i> التحكم المباشر بموارد وخزائن العصابات</h4>
+       <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:1rem;">
+        <div>
+         <label style="font-size:0.8rem; color:var(--text-muted);">العصابة المستهدفة</label> <select id="mafia-control-gang-select" class="form-control"> <option value="ذا لوست امسي">ذا لوست امسي</option> <option value="البلود">البلود</option> <option value="البلس">البلس</option> <option value="قروف ستريت">قروف ستريت</option> </select>
+        </div>
+        <div>
+         <label style="font-size:0.8rem; color:var(--text-muted);">نوع المورد / الخزينة</label> <select id="mafia-control-resource-type" class="form-control"> <option value="money">الخزينة المالية ($)</option> <option value="weapons">خزينة الأسلحة (قطع)</option> <option value="points">نقاط الهيبة (Points)</option> </select>
+        </div>
+        <div>
+         <label style="font-size:0.8rem; color:var(--text-muted);">نوع الإجراء</label> <select id="mafia-control-action-type" class="form-control"> <option value="add">إضافة / تحويل (+)</option> <option value="deduct">خصم / سحب (-)</option> </select>
+        </div>
+        <div>
+         <label style="font-size:0.8rem; color:var(--text-muted);">الكمية / المبلغ</label> <input type="number" id="mafia-control-amount" class="form-control" placeholder="0">
+        </div>
+       </div>
+       <button class="btn btn-purple" style="margin-top:12px;" onclick="executeMafiaAbsoluteControl()">تطبيق إجراء السيطرة المباشرة ⚡</button>
+      </div>
+      <h4 style="color:var(--accent-purple); margin-bottom:10px;"><i class="fa-solid fa-scroll"></i> تكليف وتوجيه المهام للعصابات</h4>
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:1rem; margin-bottom:1rem;">
+       <div>
+        <label style="font-size:0.8rem; color:var(--text-muted);">العصابة المستهدفة</label> <select id="mafia-target-gang-select" class="form-control"> <option value="ذا لوست امسي">ذا لوست امسي</option> <option value="البلود">البلود</option> <option value="البلس">البلس</option> <option value="قروف ستريت">قروف ستريت</option> </select>
+       </div>
+       <div>
+        <label style="font-size:0.8rem; color:var(--text-muted);">عنوان التكليف / المهمة</label> <input type="text" id="mafia-mission-title" class="form-control" placeholder="مثال: تأمين شحنة السلاح">
+       </div>
+       <div>
+        <label style="font-size:0.8rem; color:var(--text-muted);">المكافأة المالية ($)</label> <input type="number" id="mafia-mission-reward-money" class="form-control" placeholder="0">
+       </div>
+       <div>
+        <label style="font-size:0.8rem; color:var(--text-muted);">مكافأة النقاط (الهيبة)</label> <input type="number" id="mafia-mission-reward-points" class="form-control" placeholder="0">
+       </div>
+      </div>
+      <button class="btn btn-purple" style="width:auto; padding:0.7rem 2rem;" onclick="mafiaAssignMission()">إصدار المهمة للعصابة رسمياً</button>
+     </div>
+     <div class="table-container" style="padding:1.5rem;">
+      <h3><i class="fa-solid fa-scroll"></i> قائمة مهام المافيا الموجهة للعصابة</h3>
+      <div id="gang-assigned-missions-list" style="margin-top:1rem;"></div>
+     </div>
+    </div>
+   </section>
+  </main>
+
+  <!-- Interactive JavaScript Logic -->
+  <script>
+        const STORAGE_KEY_CITIZENS = 'RP_CITIZENS_DB_V3';
+        const STORAGE_KEY_POLICE = 'RP_POLICE_DB_V3';
+        const STORAGE_KEY_VAULTS = 'RP_VAULTS_DB_V3';
+
+        let currentCitizen = null;
+        let isOwnerLoggedIn = false;
+        const OWNER_SECRET_CODE = "ntNT112233";
+
+        let globalCitizens = JSON.parse(localStorage.getItem(STORAGE_KEY_CITIZENS)) || [];
+        
+        let officersDB = JSON.parse(localStorage.getItem(STORAGE_KEY_POLICE)) || [
+            { name: "قائد الشرطة (A-0)", code: "A-0", pin: "6012", rank: "القائد الأعلى", category: "الضباط", canHire: true }
+        ];
+
+        let sectorVaults = JSON.parse(localStorage.getItem(STORAGE_KEY_VAULTS)) || {
+            finance: 2450900,
+            interior: 500000,
+            intel: 750000,
+            justice: 300000
+        };
+
+        function saveDataToLocalStorage() {
+            localStorage.setItem(STORAGE_KEY_CITIZENS, JSON.stringify(globalCitizens));
+            localStorage.setItem(STORAGE_KEY_POLICE, JSON.stringify(officersDB));
+            localStorage.setItem(STORAGE_KEY_VAULTS, JSON.stringify(sectorVaults));
+            updateVaultDisplaysUI();
+        }
+
+        function updateVaultDisplaysUI() {
+            const intDisp = document.getElementById('interior-vault-display');
+            if (intDisp) intDisp.innerText = '$' + sectorVaults.interior.toLocaleString();
+
+            const justDisp = document.getElementById('justice-vault-display');
+            if (justDisp) justDisp.innerText = '$' + sectorVaults.justice.toLocaleString();
+
+            const finMain = document.getElementById('fin-stat-main');
+            if (finMain) finMain.innerText = '$' + sectorVaults.finance.toLocaleString();
+
+            const finInt = document.getElementById('fin-stat-interior');
+            if (finInt) finInt.innerText = '$' + sectorVaults.interior.toLocaleString();
+
+            const finIntel = document.getElementById('fin-stat-intel');
+            if (finIntel) finIntel.innerText = '$' + sectorVaults.intel.toLocaleString();
+
+            const finJust = document.getElementById('fin-stat-justice');
+            if (finJust) finJust.innerText = '$' + sectorVaults.justice.toLocaleString();
+
+            const totalOwnerVaults = sectorVaults.finance + sectorVaults.interior + sectorVaults.intel + sectorVaults.justice;
+            const ownerTotalDisp = document.getElementById('owner-stat-total-treasury');
+            if (ownerTotalDisp) ownerTotalDisp.innerText = '$' + totalOwnerVaults.toLocaleString();
+        }
+
+        let currentCitizenCards = [
+            { cardNum: "4532 8901 2234 1092", cardType: "فيزا الذهبية", balance: 15000, colorClass: "gold-card" },
+            { cardNum: "5214 7761 9902 4431", cardType: "ماستركارد البلاتينية", balance: 10400, colorClass: "purple-card" }
+        ];
+
+        const officerRanks = [
+            { name: "جندي", category: "الأفراد", canHire: false },
+            { name: "عريف", category: "الأفراد", canHire: false },
+            { name: "رقيب", category: "الأفراد", canHire: false },
+            { name: "ملازم", category: "الضباط", canHire: false },
+            { name: "نقيب", category: "الضباط", canHire: false },
+            { name: "عقيد", category: "الضباط", canHire: true },
+            { name: "لواء", category: "الضباط", canHire: true },
+            { name: "فريق اول", category: "الضباط", canHire: true }
+        ];
+
+        const vehiclesDB = [];
+        const weaponsDB = [];
+        let loggedInPoliceUser = null;
+
+        function generateFingerprint() {
+            const chars = '0123456789ABCDEF';
+            let fp = 'FP-';
+            for (let i = 0; i < 8; i++) {
+                fp += chars[Math.floor(Math.random() * chars.length)];
+            }
+            return fp;
+        }
+
+        window.onload = function() {
+            document.getElementById('id-fingerprint').value = generateFingerprint();
+            renderFinanceCardsView();
+            renderJusticeCitizenFineView();
+            updateVaultDisplaysUI();
+            loadSavedBureauState();
+        };
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
+        }
+
+        function switchSection(secId) {
+            if (secId !== 'home' && secId !== 'owner' && secId !== 'bureau' && !currentCitizen) {
+                alert('سجل الدخول بهوية لفتح هذه القائمة!');
+                return;
+            }
+
+            const sections = document.querySelectorAll('.section-panel');
+            sections.forEach(sec => sec.classList.remove('active'));
+
+            const targetSection = document.getElementById('sec-' + secId);
+            if (targetSection) targetSection.classList.add('active');
+
+            toggleSidebar();
+        }
+
+        /* National Intelligence Launchers */
+        function openFederalBureauLogin() {
+            document.getElementById('fedBureauLauncherCard').classList.add('hidden');
+            document.getElementById('integratedBureauApp').classList.remove('hidden');
+        }
+
+        function closeFederalBureauApp() {
+            document.getElementById('integratedBureauApp').classList.add('hidden');
+            document.getElementById('fedBureauLauncherCard').classList.remove('hidden');
+        }
+
+        /* --- OWNER ABSOLUTE DASHBOARD LOGIC --- */
+        function loginOwner() {
+            const passInput = document.getElementById('owner-pass-code').value.trim();
+
+            if (passInput === OWNER_SECRET_CODE) {
+                isOwnerLoggedIn = true;
+                document.getElementById('owner-auth').style.display = 'none';
+                document.getElementById('owner-dash').style.display = 'block';
+
+                renderOwnerDashboardData();
+                updateVaultDisplaysUI();
+                alert('أهلاً بك يا مالك السيرفر المطلق! تم فتح كافة الصلاحيات المطلقة والخزائن والحسابات بنجاح.');
+            } else {
+                alert('رمز المالك غير صحيح! الوصول مرفوض.');
+            }
+        }
+
+        function logoutOwner() {
+            isOwnerLoggedIn = false;
+            document.getElementById('owner-pass-code').value = '';
+            document.getElementById('owner-auth').style.display = 'block';
+            document.getElementById('owner-dash').style.display = 'none';
+        }
+
+        function renderOwnerDashboardData() {
+            document.getElementById('owner-stat-citizens').innerText = globalCitizens.length;
+            document.getElementById('owner-stat-police').innerText = officersDB.length;
+            document.getElementById('owner-stat-intel').innerText = 0;
+
+            const listContainer = document.getElementById('owner-citizens-list');
+            listContainer.innerHTML = '';
+
+            if (globalCitizens.length === 0) {
+                listContainer.innerHTML = `<p style="color:var(--text-muted);">لا توجد هويات أو حسابات مسجلة حالياً بالسيرفر.</p>`;
+                return;
+            }
+
+            globalCitizens.forEach((cit, index) => {
+                const isFrozen = cit.isFrozen ? '<span style="color:var(--accent-red); font-weight:bold;"> [حساب مجمد ❄️]</span>' : '';
+                const item = document.createElement('div');
+                item.className = 'sys-card';
+                item.style.borderRight = cit.isFrozen ? '4px solid var(--accent-red)' : '4px solid var(--accent-owner)';
+                item.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                        <div>
+                            <h4 style="color:var(--accent-owner);"><i class="fa-solid fa-crown"></i> ${cit.name} ${isFrozen}</h4>
+                            <p style="font-size:0.85rem; color:var(--text-muted); margin-top:4px;">
+                                <b>رقم الهوية:</b> <span style="color:var(--accent-gold); font-family:monospace;">${cit.id}</span> | 
+                                <b>البصمة:</b> <span style="font-family:monospace;">${cit.fingerprint}</span> | 
+                                <b>الوظيفة الحالية:</b> <b style="color:var(--accent-blue);">${cit.job}</b>
+                            </p>
+                        </div>
+                        <div style="display:flex; gap:10px;">
+                            <button class="btn btn-purple" style="padding:0.4rem 0.8rem; margin:0; font-size:0.8rem;" onclick="ownerChangeJob(${index})">تغيير الوظيفة</button>
+                            <button class="btn btn-danger" style="padding:0.4rem 0.8rem; margin:0; font-size:0.8rem;" onclick="ownerDeleteCitizen(${index})">حذف الهوية</button>
+                        </div>
+                    </div>
+                `;
+                listContainer.appendChild(item);
+            });
+        }
+
+        function ownerManageVaults() {
+            const vaultKey = document.getElementById('owner-vault-select').value;
+            const amount = parseFloat(document.getElementById('owner-vault-amount').value);
+            const action = document.getElementById('owner-vault-action').value;
+
+            if (isNaN(amount) || amount <= 0) {
+                alert('يرجى كتابة مبلغ صحيح!');
+                return;
+            }
+
+            if (action === 'add') {
+                sectorVaults[vaultKey] += amount;
+            } else {
+                if (sectorVaults[vaultKey] < amount) {
+                    alert('المبلغ المراد خصمه أكبر من رصيد الخزينة الحالي!');
+                    return;
+                }
+                sectorVaults[vaultKey] -= amount;
+            }
+
+            saveDataToLocalStorage();
+            document.getElementById('owner-vault-amount').value = '';
+            alert('تم تعديل خزينة القطاع بواسطة المالك بنجاح!');
+        }
+
+        function ownerDirectCitizenMoneyControl() {
+            const query = document.getElementById('owner-cit-id-input').value.trim();
+            const amount = parseFloat(document.getElementById('owner-cit-money-amount').value);
+            const action = document.getElementById('owner-cit-money-action').value;
+
+            const cit = globalCitizens.find(c => c.id === query || c.name.includes(query));
+
+            if (!cit) {
+                alert('لم يتم العثور على المواطن بهذا الاسم أو رقم الهوية!');
+                return;
+            }
+
+            if (action === 'freeze') {
+                cit.isFrozen = true;
+                saveDataToLocalStorage();
+                renderOwnerDashboardData();
+                alert(`تم تجميد الحساب البنكي والبطاقات المصرفية للمواطن (${cit.name}) بنجاح بواسطة المالك!`);
+                return;
+            }
+
+            if (action === 'unfreeze') {
+                cit.isFrozen = false;
+                saveDataToLocalStorage();
+                renderOwnerDashboardData();
+                alert(`تم فك التجميد عن الحساب البنكي للمواطن (${cit.name}) بنجاح!`);
+                return;
+            }
+
+            if (isNaN(amount) || amount <= 0) {
+                alert('يرجى كتابة مبلغ صحيح!');
+                return;
+            }
+
+            if (action === 'add') {
+                if (currentCitizenCards.length > 0) {
+                    currentCitizenCards[0].balance += amount;
+                    renderFinanceCardsView();
+                    renderJusticeCitizenFineView();
+                }
+                alert(`تم إضافة مبلغ $${amount.toLocaleString()} لحساب المواطن (${cit.name}) بقرار المالك المباشر!`);
+            } else if (action === 'deduct') {
+                if (currentCitizenCards.length > 0) {
+                    currentCitizenCards[0].balance = Math.max(0, currentCitizenCards[0].balance - amount);
+                    renderFinanceCardsView();
+                    renderJusticeCitizenFineView();
+                }
+                alert(`تم خصم/سحب مبلغ $${amount.toLocaleString()} من حساب المواطن (${cit.name}) بقرار المالك!`);
+            }
+
+            saveDataToLocalStorage();
+            document.getElementById('owner-cit-money-amount').value = '';
+        }
+
+        function ownerDirectHire() {
+            const name = document.getElementById('owner-hire-name').value.trim();
+            const code = document.getElementById('owner-hire-code').value.trim();
+            const pin = document.getElementById('owner-hire-pin').value.trim();
+            const dept = document.getElementById('owner-hire-dept').value;
+
+            if (!name || !code || !pin) {
+                alert('يرجى تعبئة كافة حقول التوظيف المباشر!');
+                return;
+            }
+
+            if (dept === 'interior') {
+                officersDB.push({ name: name, code: code, pin: pin, rank: "فريق اول", category: "الضباط", canHire: true });
+            }
+
+            saveDataToLocalStorage();
+            document.getElementById('owner-hire-name').value = '';
+            document.getElementById('owner-hire-code').value = '';
+            document.getElementById('owner-hire-pin').value = '';
+
+            alert(`تم توظيف (${name}) بصفة قيادية في وزارة الداخلية بقرار المالك المباشر!`);
+        }
+
+        function ownerChangeJob(index) {
+            const jobs = ['مواطن', 'وزارة العدل', 'وزارة المالية', 'وزارة الداخلية', 'الاستخبارات الوطنية'];
+            const newJob = prompt(`اختر الوظيفة الجديدة للمواطن (${globalCitizens[index].name}):\n` + jobs.join(' - '));
+
+            if (newJob && jobs.includes(newJob)) {
+                globalCitizens[index].job = newJob;
+                saveDataToLocalStorage();
+                renderOwnerDashboardData();
+                alert('تم تحديث وظيفة المواطن بنجاح!');
+            } else if (newJob) {
+                alert('جهة غير معتمدة!');
+            }
+        }
+
+        function ownerDeleteCitizen(index) {
+            if (confirm(`هل أنت تأكد من حذف هوية المواطن (${globalCitizens[index].name}) نهائياً؟`)) {
+                globalCitizens.splice(index, 1);
+                saveDataToLocalStorage();
+                renderOwnerDashboardData();
+                alert('تم حذف الهوية من قاعدة البيانات!');
+            }
+        }
+
+        function resetAllServerDataData() {
+            if (confirm('تنبيه خطير جداً: هل تريد مسح كافة بيانات السيرفر وإعادة الضبط بالكامل؟')) {
+                localStorage.clear();
+                globalCitizens = [];
+                officersDB = [{ name: "قائد الشرطة (A-0)", code: "A-0", pin: "6012", rank: "القائد الأعلى", category: "الضباط", canHire: true }];
+                sectorVaults = { finance: 2450900, interior: 500000, intel: 750000, justice: 300000 };
+                saveDataToLocalStorage();
+                renderOwnerDashboardData();
+                alert('تم ترسيت بيانات السيرفر بالكامل وإعادتها لنقطة الصفر!');
+            }
+        }
+
+        /* --- IDENTITY SYSTEM LOGIC --- */
+        function toggleIdentityMode(mode) {
+            const createForm = document.getElementById('form-identity-create');
+            const loginForm = document.getElementById('form-identity-login');
+            const btnCreate = document.getElementById('btn-toggle-create');
+            const btnLogin = document.getElementById('btn-toggle-login');
+
+            if (mode === 'create') {
+                createForm.style.display = 'block';
+                loginForm.style.display = 'none';
+                btnCreate.classList.add('active');
+                btnLogin.classList.remove('active');
+            } else {
+                createForm.style.display = 'none';
+                loginForm.style.display = 'block';
+                btnCreate.classList.remove('active');
+                btnLogin.classList.add('active');
+            }
+        }
+
+        function createNewIdentity() {
+            const name = document.getElementById('id-fullname').value.trim();
+            const dob = document.getElementById('id-dob').value;
+            const job = document.getElementById('id-job').value;
+            const fp = document.getElementById('id-fingerprint').value;
+
+            if (!name || !dob) {
+                alert('يرجى كتابة الاسم الكامل وتاريخ الميلاد لتفعيل الهوية الوطنية!');
+                return;
+            }
+
+            const idNumber = '10' + Math.floor(10000000 + Math.random() * 90000000);
+
+            const newCitizen = {
+                id: idNumber,
+                name: name,
+                dob: dob,
+                job: job,
+                fingerprint: fp,
+                status: 'سليم (لا توجد سوابق)',
+                isFrozen: false
+            };
+
+            globalCitizens.push(newCitizen);
+            currentCitizen = newCitizen;
+            saveDataToLocalStorage();
+
+            updateUserPermissionsUI();
+
+            alert(`تم إصدار هويتك وحفظها بالنظام بنجاح!\nرقم الهوية الوطنية الخاص بك: (${idNumber})`);
+            document.getElementById('id-fullname').value = '';
+            document.getElementById('id-fingerprint').value = generateFingerprint();
+        }
+
+        function loginCitizenIdentity() {
+            const idInput = document.getElementById('login-id-num').value.trim();
+            const found = globalCitizens.find(c => c.id === idInput);
+
+            if (found) {
+                currentCitizen = found;
+                updateUserPermissionsUI();
+                alert(`تم تسجيل الدخول بنجاح للهوية: ${found.name}`);
+            } else {
+                alert('رقم الهوية غير مسجل بالنظام! أنشئ هوية جديدة أو تأكد من الرقم.');
+            }
+        }
+
+        function updateUserPermissionsUI() {
+            if (!currentCitizen) return;
+
+            document.getElementById('global-login-status').innerText = `هوية مفعلة: ${currentCitizen.name} (${currentCitizen.job})`;
+
+            document.getElementById('active-citizen-card').style.display = 'block';
+            document.getElementById('citizen-card-details').innerHTML = `
+                <h3 style="color:var(--accent-green); mb-2;"><i class="fa-solid fa-user-check"></i> الهوية المفعلة حالياً: ${currentCitizen.name}</h3>
+                <p><b>رقم الهوية:</b> <span style="color:var(--accent-gold); font-family:monospace;">${currentCitizen.id}</span></p>
+                <p><b>الجهة / الوظيفة:</b> <b style="color:var(--accent-blue);">${currentCitizen.job}</b></p>
+                <p><b>تاريخ الميلاد:</b> ${currentCitizen.dob}</p>
+                <p><b>رمز البصمة الرقمية:</b> <span style="font-family:monospace;">${currentCitizen.fingerprint}</span></p>
+                <p><b>حالة الحساب البنكي:</b> <b style="color:${currentCitizen.isFrozen ? 'var(--accent-red)' : 'var(--accent-green)'}">${currentCitizen.isFrozen ? 'مجمد وموقوف ❄️' : 'نشط وفعّال 🔓'}</b></p>
+            `;
+
+            if (currentCitizen.job === 'وزارة العدل') {
+                document.getElementById('justice-public-view').style.display = 'none';
+                document.getElementById('justice-staff-view').style.display = 'block';
+                document.getElementById('justice-staff-vault').style.display = 'grid';
+            } else {
+                document.getElementById('justice-public-view').style.display = 'block';
+                document.getElementById('justice-staff-view').style.display = 'none';
+                document.getElementById('justice-staff-vault').style.display = 'none';
+            }
+
+            if (currentCitizen.job === 'وزارة المالية') {
+                document.getElementById('finance-staff-view').style.display = 'block';
+            } else {
+                document.getElementById('finance-staff-view').style.display = 'none';
+            }
+
+            renderFinanceCardsView();
+            renderJusticeCitizenFineView();
+        }
+
+        /* --- POLICE SYSTEM LOGIC --- */
+        function loginInterior() {
+            const codeInput = document.getElementById('int-code').value.trim();
+            const pinInput = document.getElementById('int-pass').value.trim();
+
+            const user = officersDB.find(o => o.code.toUpperCase() === codeInput.toUpperCase() && o.pin === pinInput);
+
+            if (user) {
+                loggedInPoliceUser = user;
+                document.getElementById('interior-auth').style.display = 'none';
+                document.getElementById('interior-dash').style.display = 'block';
+
+                document.getElementById('int-welcome-text').innerHTML = `
+                    مرحباً بك: <b>${user.name}</b> | الكود: <span style="color:var(--accent-gold);">${user.code}</span> | الرتبة: <b style="color:var(--accent-blue);">${user.rank}</b>
+                `;
+
+                if (user.canHire) {
+                    document.getElementById('recruitment-panel').style.display = 'block';
+                    document.getElementById('tab-roster-btn').style.display = 'inline-block';
+                } else {
+                    document.getElementById('recruitment-panel').style.display = 'none';
+                    document.getElementById('tab-roster-btn').style.display = 'none';
+                }
+
+                renderRosterTable();
+                switchInteriorSys('search');
+            } else {
+                alert('خطأ في إدخال الكود العسكري أو الرمز الوظيفي للشرطة!');
+            }
+        }
+
+        function logoutInterior() {
+            loggedInPoliceUser = null;
+            document.getElementById('interior-auth').style.display = 'block';
+            document.getElementById('interior-dash').style.display = 'none';
+        }
+
+        function hireNewOfficer() {
+            const name = document.getElementById('new-off-name').value.trim();
+            const code = document.getElementById('new-off-code').value.trim();
+            const pin = document.getElementById('new-off-pin').value.trim();
+            const rank = document.getElementById('new-off-rank').value;
+
+            if (!name || !code || !pin) {
+                alert('يرجى ملء جميع حقول التوظيف المعتمدة!');
+                return;
+            }
+
+            const rankInfo = officerRanks.find(r => r.name === rank) || { category: "الضباط", canHire: false };
+            
+            officersDB.push({
+                name: name,
+                code: code,
+                pin: pin,
+                rank: rank,
+                category: rankInfo.category,
+                canHire: rankInfo.canHire
+            });
+
+            saveDataToLocalStorage();
+
+            document.getElementById('new-off-name').value = '';
+            document.getElementById('new-off-code').value = '';
+            document.getElementById('new-off-pin').value = '';
+
+            renderRosterTable();
+            alert(`تم إصدار قرار توظيف العسكري (${name}) برتبة (${rank}) وكوده (${code})!`);
+        }
+
+        function renderRosterTable() {
+            const tbody = document.getElementById('roster-table-body');
+            tbody.innerHTML = '';
+
+            officersDB.forEach(off => {
+                const tr = document.createElement('tr');
+                const badgeClass = off.canHire ? 'badge-commander' : (off.category === 'الضباط' ? 'badge-officer' : 'badge-enlisted');
+                const showPin = (loggedInPoliceUser && loggedInPoliceUser.canHire) ? `<b style="color:var(--accent-gold); font-family:monospace;">${off.pin}</b>` : '****';
+
+                tr.innerHTML = `
+                    <td><b>${off.name}</b></td>
+                    <td><span style="color:var(--accent-gold); font-family:monospace;">${off.code}</span></td>
+                    <td>${showPin}</td>
+                    <td><span class="badge ${badgeClass}">${off.rank}</span></td>
+                    <td><span style="color:var(--text-muted); font-size:0.85rem;">${off.category}</span></td>
+                    <td><span style="color:var(--accent-green)">معتمد وفعّال</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function switchInteriorSys(sysName) {
+            document.getElementById('sys-search').style.display = 'none';
+            document.getElementById('sys-dispatch').style.display = 'none';
+            document.getElementById('sys-fines').style.display = 'none';
+            document.getElementById('sys-weapons').style.display = 'none';
+            document.getElementById('sys-warrants').style.display = 'none';
+            document.getElementById('sys-roster').style.display = 'none';
+
+            document.getElementById('sys-' + sysName).style.display = 'block';
+        }
+
+        function searchCitizen() {
+            const query = document.getElementById('search-citizen-input').value.trim();
+            const resBox = document.getElementById('citizen-result');
+
+            const found = globalCitizens.find(c => c.name.includes(query) || c.id === query || c.fingerprint === query);
+            resBox.style.display = 'block';
+
+            if (found) {
+                resBox.innerHTML = `
+                    <h4 style="color:var(--accent-blue);"><i class="fa-solid fa-user-check"></i> نتيجة البحث: ${found.name}</h4>
+                    <p style="margin-top:5px; font-size:0.88rem;"><b>رقم الهوية:</b> ${found.id}</p>
+                    <p style="margin-top:5px; font-size:0.88rem;"><b>بصمة الأصبع:</b> <span style="font-family:monospace; color:var(--accent-purple);">${found.fingerprint}</span></p>
+                    <p style="margin-top:5px; font-size:0.88rem;"><b>المهنة / الجهة:</b> ${found.job}</p>
+                    <p style="margin-top:5px; font-size:0.88rem;"><b>الحالة والأرضية الأمنية:</b> <span style="color:${found.status.includes('مطلوب') ? 'var(--accent-red)':'var(--accent-green)'}; font-weight:bold;">${found.status}</span></p>
+                `;
+            } else {
+                resBox.innerHTML = `<p style="color:var(--accent-red);">لم يتم العثور على مواطن بهذه البيانات في سجلات الهوية الوطنية.</p>`;
+            }
+        }
+
+        function searchVehicle() {
+            const query = document.getElementById('search-plate-input').value.trim();
+            const resBox = document.getElementById('vehicle-result');
+
+            const found = vehiclesDB.find(v => v.plate.includes(query));
+            resBox.style.display = 'block';
+
+            if (found) {
+                resBox.innerHTML = `
+                    <h4 style="color:var(--accent-blue);"><i class="fa-solid fa-car-side"></i> اللوحة: ${found.plate}</h4>
+                    <p style="margin-top:5px; font-size:0.88rem;"><b>النوع:</b> ${found.model}</p>
+                    <p style="margin-top:5px; font-size:0.88rem;"><b>المالك:</b> ${found.owner}</p>
+                `;
+            } else {
+                resBox.innerHTML = `<p style="color:var(--accent-red);">لا يوجد مركبة مسجلة بهذه اللوحة.</p>`;
+            }
+        }
+
+        function addFine() {
+            const citizenQuery = document.getElementById('fine-citizen').value.trim();
+            const type = document.getElementById('fine-type').value.trim();
+            const amount = document.getElementById('fine-amount').value.trim();
+
+            if(!citizenQuery || !type || !amount) {
+                alert('يرجى كتابة كافة بيانات المخالفة!');
+                return;
+            }
+
+            const cit = globalCitizens.find(c => c.id === citizenQuery || c.name.includes(citizenQuery));
+
+            if (cit) {
+                cit.status = `مخالفة مرورية/مالية: ${type} (غرامة: $${parseFloat(amount).toLocaleString()})`;
+            } else if (currentCitizen && (currentCitizen.id === citizenQuery || currentCitizen.name.includes(citizenQuery))) {
+                currentCitizen.status = `مخالفة مرورية/مالية: ${type} (غرامة: $${parseFloat(amount).toLocaleString()})`;
+            }
+
+            saveDataToLocalStorage();
+            renderJusticeCitizenFineView();
+
+            const list = document.getElementById('fines-list');
+            const item = document.createElement('div');
+            item.className = 'sys-card';
+            item.style.borderRight = '4px solid var(--accent-gold)';
+            item.innerHTML = `<b>مخالفة مسجلة:</b> المواطن/الهوية (${citizenQuery}) - السبب: ${type} - الغرامة: $${amount}`;
+            list.prepend(item);
+
+            document.getElementById('fine-citizen').value = '';
+            document.getElementById('fine-type').value = '';
+            document.getElementById('fine-amount').value = '';
+            alert('تم تسجيل المخالفة بنجاح وتحديث السجل العدلي للمواطن فوراً!');
+        }
+
+        function issueWeaponLicense() {
+            const owner = document.getElementById('weap-owner').value.trim();
+            const serial = document.getElementById('weap-serial').value.trim();
+            const type = document.getElementById('weap-type').value;
+
+            if(!owner || !serial) {
+                alert('يرجى إدخال المالك والرقم التسلسلي للسلاح!');
+                return;
+            }
+
+            weaponsDB.push({ serial: serial, owner: owner, type: type, valid: true });
+
+            document.getElementById('weap-owner').value = '';
+            document.getElementById('weap-serial').value = '';
+            alert(`تم إصدار ترخيص السلاح رسميًا للرقم التسلسلي (${serial})!`);
+        }
+
+        function checkWeapon() {
+            const serial = document.getElementById('check-serial').value.trim();
+            const resBox = document.getElementById('weapon-check-result');
+
+            const found = weaponsDB.find(w => w.serial.toUpperCase() === serial.toUpperCase());
+            resBox.style.display = 'block';
+
+            if(found) {
+                resBox.innerHTML = `
+                    <h4 style="color:var(--accent-green);"><i class="fa-solid fa-shield-check"></i> سلاح مرخص رسمياً</h4>
+                    <p style="margin-top:5px; font-size:0.88rem;"><b>المالك المسجل:</b> ${found.owner}</p>
+                    <p style="margin-top:5px; font-size:0.88rem;"><b>نوع السلاح:</b> ${found.type}</p>
+                    <p style="margin-top:5px; font-size:0.88rem;"><b>الرقم التسلسلي:</b> ${found.serial}</p>
+                `;
+            } else {
+                resBox.innerHTML = `<p style="color:var(--accent-red);"><i class="fa-solid fa-triangle-exclamation"></i> السلاح غير مرخص أو تسلسلي مجهول!</p>`;
+            }
+        }
+
+        function submitIncident() {
+            const target = document.getElementById('inc-target').value.trim();
+            const title = document.getElementById('inc-title').value.trim();
+            const details = document.getElementById('inc-details').value.trim();
+
+            if (!target || !title) {
+                alert('أدخل اسم المشتبه به والتهمة!');
+                return;
+            }
+
+            const cit = globalCitizens.find(c => c.name.includes(target) || c.id === target);
+            if(cit) {
+                cit.status = 'مطلوب أمنياً: ' + title;
+                saveDataToLocalStorage();
+            }
+
+            const list = document.getElementById('incidents-list');
+            const item = document.createElement('div');
+            item.className = 'sys-card';
+            item.style.borderRight = '4px solid var(--accent-red)';
+            item.innerHTML = `<b>تثبيت قضية:</b> المشتبه به (${target}) - التهمة: ${title} <br><small style="color:var(--text-muted);">${details}</small>`;
+            list.prepend(item);
+
+            document.getElementById('inc-target').value = '';
+            document.getElementById('inc-title').value = '';
+            document.getElementById('inc-details').value = '';
+            alert('تم تثبيت التقرير القضائي وتعميمه على كافة الهويات والنظام!');
+        }
+
+        /* --- FINANCE & CARDS SYSTEM LOGIC --- */
+        function renderFinanceCardsView() {
+            const fullList = document.getElementById('finance-cards-full-list');
+            const selectSource = document.getElementById('transfer-source-card-fin');
+
+            fullList.innerHTML = '';
+            selectSource.innerHTML = '';
+
+            const isFrozen = currentCitizen && currentCitizen.isFrozen;
+
+            currentCitizenCards.forEach((card, idx) => {
+                const fullCard = document.createElement('div');
+                fullCard.className = `credit-card-ui ${isFrozen ? 'frozen-card' : card.colorClass}`;
+                fullCard.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:0.9rem; font-weight:bold;">${card.cardType} ${isFrozen ? '(مجمدة ❄️)' : ''}</span>
+                        <i class="fa-brands fa-cc-visa" style="font-size:1.5rem;"></i>
+                    </div>
+                    <div class="card-num-disp">${card.cardNum}</div>
+                    <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+                        <span class="card-holder-disp">${isFrozen ? 'حساب موقوف بقرار مالي' : 'بطاقة رسمية'}</span>
+                        <span style="font-size:1.1rem; font-weight:bold;">$${card.balance.toLocaleString()}</span>
+                    </div>
+                `;
+                fullList.appendChild(fullCard);
+
+                const opt = document.createElement('option');
+                opt.value = idx;
+                opt.innerText = `${card.cardType} ($${card.balance.toLocaleString()})`;
+                selectSource.appendChild(opt);
+            });
+        }
+
+        function issueNewBankCard() {
+            if (currentCitizen && currentCitizen.isFrozen) {
+                alert('حسابك البنكي مجمد بقرار من وزارة المالية / المالك! لا يمكنك إصدار بطاقات جديدة.');
+                return;
+            }
+
+            const cardTypes = [
+                { type: "بطاقة مدى الرقمية", color: "" },
+                { type: "بطاقة بلاك ماستر", color: "purple-card" },
+                { type: "بطاقة كلاسيك الذهبية", color: "gold-card" }
+            ];
+
+            const randType = cardTypes[Math.floor(Math.random() * cardTypes.length)];
+            
+            let cardNum = '';
+            for(let i=0; i<4; i++) {
+                cardNum += Math.floor(1000 + Math.random() * 9000) + (i < 3 ? ' ' : '');
+            }
+
+            currentCitizenCards.push({
+                cardNum: cardNum,
+                cardType: randType.type,
+                balance: 5000,
+                colorClass: randType.color
+            });
+
+            renderFinanceCardsView();
+            renderJusticeCitizenFineView();
+            alert(`تم إصدار بطاقة بنكية جديدة لك بنجاح!\nرقم البطاقة: ${cardNum}\nرصيد افتراضي: $5,000`);
+        }
+
+        function executeCardTransferFin() {
+            if (currentCitizen && currentCitizen.isFrozen) {
+                alert('حسابك البنكي مجمد ❄️! حُظرت كافة عمليات التحويل والصرف.');
+                return;
+            }
+
+            const srcIdx = document.getElementById('transfer-source-card-fin').value;
+            const targetCardNum = document.getElementById('transfer-target-card-fin').value.trim();
+            const amount = parseFloat(document.getElementById('transfer-amount-fin').value);
+
+            if (!targetCardNum || isNaN(amount) || amount <= 0) {
+                alert('يرجى إدخال رقم بطاقة المستلم والمبلغ بشكل صحيح!');
+                return;
+            }
+
+            const srcCard = currentCitizenCards[srcIdx];
+
+            if (srcCard.balance < amount) {
+                alert('الرصيد في هذه البطاقة غير كافٍ لإتمام التحويل!');
+                return;
+            }
+
+            srcCard.balance -= amount;
+            renderFinanceCardsView();
+            renderJusticeCitizenFineView();
+
+            document.getElementById('transfer-target-card-fin').value = '';
+            document.getElementById('transfer-amount-fin').value = '';
+
+            alert(`تم تحويل مبلغ ($${amount}) بنجاح إلى البطاقة رقم:\n(${targetCardNum})`);
+        }
+
+        function executeMinisterFinanceAction() {
+            const targetDept = document.getElementById('fin-target-dept').value;
+            const amount = parseFloat(document.getElementById('fin-transfer-amount').value);
+            const action = document.getElementById('fin-transfer-action').value;
+
+            if (isNaN(amount) || amount <= 0) {
+                alert('يرجى كتابة مبلغ تحويل صحيح!');
+                return;
+            }
+
+            if (action === 'fund') {
+                if (sectorVaults.finance < amount) {
+                    alert('الخزينة العامة للدولة لا تملك رصيد كافٍ لإجراء التمويل!');
+                    return;
+                }
+                sectorVaults.finance -= amount;
+                sectorVaults[targetDept] += amount;
+                alert(`تم تمويل خزينة (${targetDept === 'interior' ? 'وزارة الداخلية' : (targetDept === 'intel' ? 'الاستخبارات الوطنية' : 'وزارة العدل')}) بمبلغ $${amount.toLocaleString()} من الخزينة العامة!`);
+            } else {
+                if (sectorVaults[targetDept] < amount) {
+                    alert('خزينة القطاع المستهدف لا تملك هذا المبلغ لاسترداده!');
+                    return;
+                }
+                sectorVaults[targetDept] -= amount;
+                sectorVaults.finance += amount;
+                alert(`تم استرداد مبلغ $${amount.toLocaleString()} من خزينة (${targetDept}) وأعيدت للخزينة العامة!`);
+            }
+
+            saveDataToLocalStorage();
+            document.getElementById('fin-transfer-amount').value = '';
+        }
+
+        function executeMinisterCitizenMoneyControl() {
+            const idInput = document.getElementById('fin-cit-id-input').value.trim();
+            const amount = parseFloat(document.getElementById('fin-cit-money-amount').value);
+            const action = document.getElementById('fin-cit-action').value;
+
+            const cit = globalCitizens.find(c => c.id === idInput);
+
+            if (!cit) {
+                alert('لم يتم العثور على مواطن برقم الهوية الوطنية هذا!');
+                return;
+            }
+
+            if (action === 'freeze') {
+                cit.isFrozen = true;
+                saveDataToLocalStorage();
+                alert(`تم تجميد الحساب البنكي والبطاقات المصرفية للمواطن (${cit.name}) بنجاح بقرار وزير المالية!`);
+                return;
+            }
+
+            if (action === 'unfreeze') {
+                cit.isFrozen = false;
+                saveDataToLocalStorage();
+                alert(`تم فك التجميد عن الحساب البنكي للمواطن (${cit.name}) بنجاح بقرار وزير المالية!`);
+                return;
+            }
+
+            if (isNaN(amount) || amount <= 0) {
+                alert('يرجى إدخال مبلغ مالي صحيح!');
+                return;
+            }
+
+            if (action === 'add') {
+                if (currentCitizenCards.length > 0) {
+                    currentCitizenCards[0].balance += amount;
+                    renderFinanceCardsView();
+                    renderJusticeCitizenFineView();
+                }
+                alert(`تم إضافة مبلغ $${amount.toLocaleString()} لحساب المواطن (${cit.name}) صاحب الهوية (${cit.id})!`);
+            } else if (action === 'deduct') {
+                if (currentCitizenCards.length > 0) {
+                    currentCitizenCards[0].balance = Math.max(0, currentCitizenCards[0].balance - amount);
+                    renderFinanceCardsView();
+                    renderJusticeCitizenFineView();
+                }
+                alert(`تم خصم/مصادرة مبلغ $${amount.toLocaleString()} من حساب المواطن (${cit.name})!`);
+            }
+
+            saveDataToLocalStorage();
+            document.getElementById('fin-cit-money-amount').value = '';
+        }
+    
+        /* --- JUSTICE AUTOMATIC FINE PAYMENT & STAFF SEARCH LOGIC --- */
+        function renderJusticeCitizenFineView() {
+            const container = document.getElementById('justice-auto-citizen-fine-card');
+            if (!container) return;
+
+            if (!currentCitizen) {
+                container.innerHTML = `<p style="color:var(--accent-red);"><i class="fa-solid fa-triangle-exclamation"></i> يرجى تسجيل الدخول بهويتك الوطنية أولاً لعرض المخالفات المسجلة بحسابك.</p>`;
+                return;
+            }
+
+            const hasFines = currentCitizen.status.includes('مطلوب') || currentCitizen.status.includes('مخالفة');
+            const fineAmount = hasFines ? 1500 : 0;
+
+            if (fineAmount > 0) {
+                container.innerHTML = `
+                    <div style="background:rgba(239, 68, 68, 0.1); border:1px solid var(--accent-red); padding:1rem; border-radius:8px;">
+                        <h4 style="color:var(--accent-red);"><i class="fa-solid fa-file-circle-exclamation"></i> تم رصد مخالفة مرورية/مالية قائمة بحسابك!</h4>
+                        <p style="margin-top:8px; font-size:0.9rem;"><b>الاسم الكامل:</b> ${currentCitizen.name}</p>
+                        <p style="margin-top:4px; font-size:0.9rem;"><b>رقم الهوية الوطنية:</b> <span style="font-family:monospace; color:var(--accent-gold); font-weight:bold;">${currentCitizen.id}</span></p>
+                        <p style="margin-top:4px; font-size:0.9rem;"><b>التصنيف والتهمة:</b> <span style="color:var(--accent-red); font-weight:bold;">${currentCitizen.status}</span></p>
+                        <p style="margin-top:6px; font-size:1.05rem;"><b>مبلغ المخالفة المستحق:</b> <b style="color:var(--accent-gold);">$${fineAmount.toLocaleString()}</b></p>
+                        <hr style="border:none; border-top:1px solid var(--border-color); margin:12px 0;">
+                        <button class="btn btn-success" style="width:100%; font-size:1rem; padding:0.8rem;" onclick="payFineDirectlyForCitizen(${fineAmount})">
+                            <i class="fa-solid fa-credit-card"></i> تسديد المخالفة الآن ($${fineAmount.toLocaleString()}) عبر وزارة العدل
+                        </button>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div style="background:rgba(16, 185, 129, 0.1); border:1px solid var(--accent-green); padding:1rem; border-radius:8px;">
+                        <h4 style="color:var(--accent-green);"><i class="fa-solid fa-circle-check"></i> سجلك العدلي سليم تماماً</h4>
+                        <p style="margin-top:8px; font-size:0.9rem;"><b>الاسم الكامل:</b> ${currentCitizen.name}</p>
+                        <p style="margin-top:4px; font-size:0.9rem;"><b>رقم الهوية الوطنية:</b> <span style="font-family:monospace; color:var(--accent-gold); font-weight:bold;">${currentCitizen.id}</span></p>
+                        <p style="margin-top:6px; color:var(--accent-green); font-size:0.88rem;"><b>لا توجد أي مخالفات مالية أو قرارات تنفيذ مسجلة بحقك لدى وزارة العدل.</b></p>
+                    </div>
+                `;
+            }
+        }
+
+        function payFineDirectlyForCitizen(amount) {
+            if (currentCitizen && currentCitizen.isFrozen) {
+                alert('حسابك البنكي مجمد بقرار مالي! لا يمكنك إجراء عمليات السداد.');
+                return;
+            }
+
+            if (currentCitizenCards.length === 0 || currentCitizenCards[0].balance < amount) {
+                alert('الرصيد المالي في بطاقتك البنكية غير كافٍ لتسديد المخالفة!');
+                return;
+            }
+
+            currentCitizenCards[0].balance -= amount;
+            sectorVaults.justice += amount;
+            currentCitizen.status = 'سليم (تم تسديد كافة المخالفات عبر وزارة العدل)';
+
+            saveDataToLocalStorage();
+            renderFinanceCardsView();
+            renderJusticeCitizenFineView();
+
+            alert(`تم تسديد المخالفة البالغة ($${amount.toLocaleString()}) بنجاح عبر وزارة العدل!\nتم تحديث سجلك المدني والعدلي تلقائياً إلى (سليم).`);
+        }
+
+        function staffCheckCitizenFines() {
+            const query = document.getElementById('staff-search-id-input').value.trim();
+            const resBox = document.getElementById('staff-fine-result-box');
+
+            if (!query) {
+                alert('يرجى كتابة رقم الهوية أو الاسم للاستعلام!');
+                return;
+            }
+
+            const cit = globalCitizens.find(c => c.id === query || c.name.includes(query));
+            resBox.style.display = 'block';
+
+            if (!cit) {
+                resBox.innerHTML = `<p style="color:var(--accent-red);"><i class="fa-solid fa-circle-xmark"></i> لم يتم العثور على مواطن بهذه الهوية في قاعدة البيانات.</p>`;
+                return;
+            }
+
+            const hasFines = cit.status.includes('مطلوب') || cit.status.includes('مخالفة');
+
+            resBox.innerHTML = `
+                <h4 style="color:var(--accent-blue);"><i class="fa-solid fa-id-card"></i> تدقيق سجل المواطن: ${cit.name}</h4>
+                <p style="margin-top:6px; font-size:0.88rem;"><b>رقم الهوية الوطنية:</b> <span style="font-family:monospace; color:var(--accent-gold);">${cit.id}</span></p>
+                <p style="margin-top:4px; font-size:0.88rem;"><b>الجهة والمهنة:</b> ${cit.job}</p>
+                <p style="margin-top:4px; font-size:0.88rem;"><b>حالة المخالفات/السجل:</b> <span style="color:${hasFines ? 'var(--accent-red)' : 'var(--accent-green)'}; font-weight:bold;">${cit.status}</span></p>
+                <p style="margin-top:4px; font-size:0.88rem;"><b>المستحقات المالية:</b> <b style="color:${hasFines ? 'var(--accent-red)' : 'var(--accent-green)'};">${hasFines ? '$1,500' : 'لا يوجد ($0)'}</b></p>
+            `;
+        }
+
+        /* --- GANGS & MAFIA ADVANCED SYSTEM LOGIC --- */
+        const STORAGE_KEY_GANGS_DATA = 'RP_GANGS_DATA_V2';
+
+        let gangsDataDB = JSON.parse(localStorage.getItem(STORAGE_KEY_GANGS_DATA)) || {
+            'ذا لوست امسي': { vaultMoney: 50000, weaponsCount: 12, points: 120, missions: [] },
+            'البلود': { vaultMoney: 85000, weaponsCount: 20, points: 200, missions: [] },
+            'البلس': { vaultMoney: 60000, weaponsCount: 15, points: 150, missions: [] },
+            'قروف ستريت': { vaultMoney: 70000, weaponsCount: 18, points: 180, missions: [] },
+            'روسيا': { vaultMoney: 500000, weaponsCount: 100, points: 1000, missions: [] }
+        };
+
+        let currentActiveGang = null;
+        let activeRobberyDetails = null;
+
+        let lockpickInterval = null;
+        let lockpickPosition = 0;
+        let lockpickDirection = 1;
+
+        let robberyCooldowns = {
+            'بقالة': 0,
+            'بيت': 0,
+            'صرافة': 0
+        };
+
+        function saveGangsData() {
+            localStorage.setItem(STORAGE_KEY_GANGS_DATA, JSON.stringify(gangsDataDB));
+            updateGangUIStats();
+        }
+
+        function loginGangNetwork() {
+            const passInput = document.getElementById('gang-password-input').value.trim();
+            const validPasswords = ['ذا لوست امسي', 'البلود', 'البلس', 'قروف ستريت', 'روسيا'];
+
+            if (!validPasswords.includes(passInput)) {
+                alert('كلمة المرور غير صحيحة! تأكد من إدخال اسم المنظومة بشكل دقيق.');
+                return;
+            }
+
+            currentActiveGang = passInput;
+
+            document.getElementById('gang-auth-card').style.display = 'none';
+            document.getElementById('gang-dash-board').style.display = 'block';
+
+            if (currentActiveGang === 'روسيا') {
+                document.getElementById('gang-portal-title').innerHTML = `<i class="fa-solid fa-crown" style="color:var(--accent-purple);"></i> لوحة المافيا الروسية العظمى (القيادة والسيادة المطلقة)`;
+                document.getElementById('mafia-assign-panel').style.display = 'block';
+                document.getElementById('gang-robbery-system-panel').style.borderRight = '4px solid var(--accent-purple)';
+            } else {
+                document.getElementById('gang-portal-title').innerHTML = `<i class="fa-solid fa-skull" style="color:var(--accent-red);"></i> لوحة عصابة: ${currentActiveGang}`;
+                document.getElementById('mafia-assign-panel').style.display = 'none';
+                document.getElementById('gang-robbery-system-panel').style.borderRight = '4px solid var(--accent-red)';
+            }
+
+            updateGangUIStats();
+            renderGangMissionsList();
+            alert(`تم فك التشفير ودخول النظام بنجاح! أهلاً بك في منظومة (${currentActiveGang}).`);
+        }
+
+        function logoutGangNetwork() {
+            currentActiveGang = null;
+            document.getElementById('gang-password-input').value = '';
+            document.getElementById('gang-auth-card').style.display = 'block';
+            document.getElementById('gang-dash-board').style.display = 'none';
+            document.getElementById('minigame-box').style.display = 'none';
+            clearInterval(lockpickInterval);
+        }
+
+        function updateGangUIStats() {
+            if (!currentActiveGang || !gangsDataDB[currentActiveGang]) return;
+
+            const data = gangsDataDB[currentActiveGang];
+            document.getElementById('gang-money-vault-disp').innerText = '$' + data.vaultMoney.toLocaleString();
+            document.getElementById('gang-weapons-count-disp').innerText = data.weaponsCount + ' قطعة';
+            document.getElementById('gang-points-disp').innerText = data.points + ' نقطة';
+        }
+
+        function startRobberyMinigame(type, moneyReward, pointsReward) {
+            const now = Math.floor(Date.now() / 1000);
+            if (robberyCooldowns[type] && now < robberyCooldowns[type]) {
+                const remaining = robberyCooldowns[type] - now;
+                alert(`عفواً! السرقات من هذا النوع في فترة تهدئة (Cooldown). يرجى الانتظار ${remaining} ثانية!`);
+                return;
+            }
+
+            activeRobberyDetails = {
+                type: type,
+                moneyReward: moneyReward,
+                pointsReward: pointsReward
+            };
+
+            const minigameBox = document.getElementById('minigame-box');
+            minigameBox.style.display = 'block';
+
+            const randomTargetLeft = Math.floor(20 + Math.random() * 50);
+            const targetZone = document.getElementById('minigame-target-zone');
+            targetZone.style.left = randomTargetLeft + '%';
+
+            lockpickPosition = 0;
+            lockpickDirection = 1;
+            const pin = document.getElementById('minigame-pin');
+
+            clearInterval(lockpickInterval);
+            lockpickInterval = setInterval(() => {
+                lockpickPosition += lockpickDirection * 2;
+                if (lockpickPosition >= 98) lockpickDirection = -1;
+                if (lockpickPosition <= 0) lockpickDirection = 1;
+                pin.style.left = lockpickPosition + '%';
+            }, 20);
+        }
+
+        function stopLockpickMinigame() {
+            if (!activeRobberyDetails) return;
+
+            clearInterval(lockpickInterval);
+
+            const pinPos = lockpickPosition;
+            const targetZone = document.getElementById('minigame-target-zone');
+            const targetLeft = parseFloat(targetZone.style.left);
+            const targetRight = targetLeft + 20;
+
+            if (pinPos >= targetLeft && pinPos <= targetRight) {
+                const gang = gangsDataDB[currentActiveGang];
+                gang.vaultMoney += activeRobberyDetails.moneyReward;
+                gang.points += activeRobberyDetails.pointsReward;
+
+                const now = Math.floor(Date.now() / 1000);
+                robberyCooldowns[activeRobberyDetails.type] = now + 60;
+
+                saveGangsData();
+
+                alert(`نجحت عملية الاختراق بنجاح! 🔓🟢\nتم كسر قفل (${activeRobberyDetails.type}) بنجاح!\n+ إضافة $${activeRobberyDetails.moneyReward.toLocaleString()} لخزينة العصابة.\n+ إضافة ${activeRobberyDetails.pointsReward} نقطة هيبة.`);
+
+                document.getElementById('minigame-box').style.display = 'none';
+                activeRobberyDetails = null;
+            } else {
+                alert('فشلت في محاذاة القفل! انكسر المكبس وانطلقت إنذارات الشرطة! حاول مجدداً.');
+                document.getElementById('minigame-box').style.display = 'none';
+                activeRobberyDetails = null;
+            }
+        }
+
+        function executeMafiaAbsoluteControl() {
+            const targetGang = document.getElementById('mafia-control-gang-select').value;
+            const resourceType = document.getElementById('mafia-control-resource-type').value;
+            const actionType = document.getElementById('mafia-control-action-type').value;
+            const amount = parseFloat(document.getElementById('mafia-control-amount').value);
+
+            if (isNaN(amount) || amount <= 0) {
+                alert('يرجى إدخال كمية أو مبلغ صحيح!');
+                return;
+            }
+
+            const gang = gangsDataDB[targetGang];
+            if (!gang) return;
+
+            if (resourceType === 'money') {
+                if (actionType === 'add') {
+                    gang.vaultMoney += amount;
+                    alert(`تم تحويل مبلغ $${amount.toLocaleString()} إلى خزينة عصابة (${targetGang}) بقرار المافيا!`);
+                } else {
+                    gang.vaultMoney = Math.max(0, gang.vaultMoney - amount);
+                    alert(`تم سحب/مصادرة مبلغ $${amount.toLocaleString()} من خزينة عصابة (${targetGang})!`);
+                }
+            } else if (resourceType === 'weapons') {
+                if (actionType === 'add') {
+                    gang.weaponsCount += amount;
+                    alert(`تم إضافة ${amount} قطعة سلاح إلى خزينة عصابة (${targetGang})!`);
+                } else {
+                    gang.weaponsCount = Math.max(0, gang.weaponsCount - amount);
+                    alert(`تم سحب/مصادرة ${amount} قطعة سلاح من خزينة عصابة (${targetGang})!`);
+                }
+            } else if (resourceType === 'points') {
+                if (actionType === 'add') {
+                    gang.points += amount;
+                    alert(`تم منح ${amount} نقطة هيبة لعصابة (${targetGang})!`);
+                } else {
+                    gang.points = Math.max(0, gang.points - amount);
+                    alert(`تم خصم ${amount} نقطة هيبة من عصابة (${targetGang}) بقرار القيادة!`);
+                }
+            }
+
+            saveGangsData();
+            document.getElementById('mafia-control-amount').value = '';
+        }
+
+        function mafiaAssignMission() {
+            const targetGang = document.getElementById('mafia-target-gang-select').value;
+            const title = document.getElementById('mafia-mission-title').value.trim();
+            const moneyReward = parseFloat(document.getElementById('mafia-mission-reward-money').value) || 0;
+            const pointsReward = parseInt(document.getElementById('mafia-mission-reward-points').value) || 0;
+
+            if (!title) {
+                alert('يرجى كتابة عنوان وشرح المهمة!');
+                return;
+            }
+
+            if (!gangsDataDB[targetGang].missions) {
+                gangsDataDB[targetGang].missions = [];
+            }
+
+            gangsDataDB[targetGang].missions.push({
+                id: Date.now(),
+                title: title,
+                moneyReward: moneyReward,
+                pointsReward: pointsReward,
+                completed: false
+            });
+
+            saveGangsData();
+
+            document.getElementById('mafia-mission-title').value = '';
+            document.getElementById('mafia-mission-reward-money').value = '';
+            document.getElementById('mafia-mission-reward-points').value = '';
+
+            renderGangMissionsList();
+            alert(`تم إصدار وتوجيه المهمة بالكامل لعصابة (${targetGang})!`);
+        }
+
+        function renderGangMissionsList() {
+            const container = document.getElementById('gang-assigned-missions-list');
+            container.innerHTML = '';
+
+            if (!currentActiveGang) return;
+
+            let missions = [];
+
+            if (currentActiveGang === 'روسيا') {
+                for (let gKey in gangsDataDB) {
+                    if (gangsDataDB[gKey].missions) {
+                        gangsDataDB[gKey].missions.forEach(m => {
+                            missions.push({ ...m, targetGang: gKey });
+                        });
+                    }
+                }
+            } else {
+                missions = gangsDataDB[currentActiveGang].missions || [];
+            }
+
+            if (missions.length === 0) {
+                container.innerHTML = `<p style="color:var(--text-muted);">لا توجد مهام موجهة حالياً من المافيا.</p>`;
+                return;
+            }
+
+            missions.forEach((m) => {
+                const card = document.createElement('div');
+                card.className = 'sys-card';
+                card.style.borderRight = m.completed ? '4px solid var(--accent-green)' : '4px solid var(--accent-purple)';
+
+                const targetInfo = m.targetGang ? `[موجهة لعصابة: ${m.targetGang}] ` : '';
+
+                card.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                        <div>
+                            <h4 style="color:var(--accent-purple);"><i class="fa-solid fa-scroll"></i> ${targetInfo}${m.title}</h4>
+                            <p style="font-size:0.85rem; color:var(--text-muted); margin-top:4px;">
+                                <b>المكافأة:</b> <span style="color:var(--accent-green); font-weight:bold;">$${m.moneyReward.toLocaleString()}</span> | 
+                                <b>النقاط:</b> <span style="color:var(--accent-gold); font-weight:bold;">${m.pointsReward} نقطة</span> | 
+                                <b>الحالة:</b> <b style="color:${m.completed ? 'var(--accent-green)' : 'var(--accent-red)'};">${m.completed ? 'مكتملة ومستلمة 🟢' : 'قيد التنفيذ 🔴'}</b>
+                            </p>
+                        </div>
+                        ${(!m.completed && currentActiveGang !== 'روسيا') ? `<button class="btn btn-success" style="width:auto; padding:0.4rem 1rem; margin:0;" onclick="completeGangMission(${m.id})">تسليم المهمة واستلام المكافأة</button>` : ''}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function completeGangMission(missionId) {
+            const gang = gangsDataDB[currentActiveGang];
+            if (!gang || !gang.missions) return;
+
+            const mission = gang.missions.find(m => m.id === missionId);
+
+            if (mission && !mission.completed) {
+                mission.completed = true;
+                gang.vaultMoney += mission.moneyReward;
+                gang.points += mission.pointsReward;
+
+                saveGangsData();
+                renderGangMissionsList();
+
+                alert(`كفو! تم إنهاء المهمة بنجاح! 🟢\n+ تم إضافة $${mission.moneyReward.toLocaleString()} لخزينة العصابة.\n+ إضافة ${mission.pointsReward} نقطة هيبة.`);
+            }
+        }
+
+        /* --- NATIONAL INTELLIGENCE (BUREAU) LOGIC --- */
+        let currentUser = null; 
+        let currentTab = 'tasks';
+
+        function formatNum(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        const mysteryBoxesData = [
+            { id: 1, name: 'جهاز تنصت عالي التردد', cost: 15000, icon: 'fa-microphone-lines', desc: 'التقاط المحادثات الحية والمكالمات القريبة.' },
+            { id: 2, name: 'شريحة تتبع GPS التكتيكية', cost: 25000, icon: 'fa-location-crosshairs', desc: 'زرع شرائح تتبع في المركبات المشبوهة.' },
+            { id: 3, name: 'طائرة استطلاع DNI-Drone', cost: 40000, icon: 'fa-drone', desc: 'استطلاع جوي وتصوير الأهداف الميدانية.' },
+            { id: 4, name: 'منظومة التشويش الراداري', cost: 60000, icon: 'fa-satellite-dish', desc: 'تعطيل الاتشارات اللاسلكية والرادارات المحلية.' },
+            { id: 5, name: 'المنظار الحراري الاستخباراتي', cost: 90000, icon: 'fa-glasses', desc: 'رؤية كاشفة للتحركات خلف السواتر والمباني.' },
+            { id: 6, name: 'برمجية الاختراق الأمني', cost: 125000, icon: 'fa-laptop-code', desc: 'اختراق كاميرات المراقبة والأنظمة المغلقة.' },
+            { id: 7, name: 'كاشف الذبذبات التكتيكي', cost: 170000, icon: 'fa-tower-cell', desc: 'كشف أجهزة التنصت والتتبع المزروعة.' },
+            { id: 8, name: 'مركبة العمليات المصفحة', cost: 220000, icon: 'fa-car-side', desc: 'مركبة سوداء ثقيلة ومصفحة مضادة للرصاص.' },
+            { id: 9, name: 'نظام المطابقة الصوتية الفدرالي', cost: 300000, icon: 'fa-wave-square', desc: 'تحليل البصمات الصوتية ومطابقتها بالسجلات.' },
+            { id: 10, name: 'مفتاح الربط بالقمر الصناعي', cost: 400000, icon: 'fa-satellite', desc: 'وصول مباشر لكاميرات الأقمار الصناعية والمسح الحراري.' }
+        ];
+
+        let appState = {
+            tasks: [
+                { id: 101, title: 'مراقبة تحركات المرفأ البحري', target: 'FBI', reward: 50000, bonus: 'معدات أمنية', desc: 'يرجى رصد المستودعات بدون إثارة الانتباه.', status: 'نشط', createdBy: 'Agent 0', date: '2026-10-22' },
+                { id: 102, title: 'تحري الترددات اللاسلكية', target: 'CIA', reward: 75000, bonus: 'ترقية أمان', desc: 'فحص الترددات المشبوهة في الأطراف الشمالية.', status: 'نشط', createdBy: 'Agent 0', date: '2026-10-22' },
+                { id: 103, title: 'عملية خاطفة سريجة للغاية', target: 'IAA', reward: 90000, bonus: 'تصريح خاص', desc: 'متابعة الأهداف وتأمين المستندات.', status: 'نشط', createdBy: 'Agent 0', date: '2026-10-22' }
+            ],
+            leaders: { FBI: 'غير محدد', CIA: 'غير محدد', IAA: 'غير محدد' },
+            members: [],
+            budgets: { FBI: 100000, CIA: 100000, IAA: 100000 },
+            unlockedBoxes: { FBI: [], CIA: [], IAA: [] },
+            reports: [],
+            messages: [
+                { id: 1, type: 'BROADCAST', senderSector: 'FED', senderName: 'Agent 0', text: 'أهلاً بكم في منظومة الاستخبارات الوطنية الموحدة.', time: '12:00' }
+            ]
+        };
+
+        function loadSavedBureauState() {
+            const saved = localStorage.getItem('dni_fed_bureau_data_v3');
+            if (saved) {
+                try { appState = JSON.parse(saved); } catch(e) { console.error(e); }
+            }
+        }
+
+        function saveBureauState() {
+            localStorage.setItem('dni_fed_bureau_data_v3', JSON.stringify(appState));
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const code = document.getElementById('passcodeInput').value.trim();
+            const errorEl = document.getElementById('loginError');
+
+            if (code === 'Agent 0') currentUser = { name: 'Agent 0', role: 'AGENT_0', sector: 'FED' };
+            else if (code === 'FBI') currentUser = { name: 'مسؤول FBI', role: 'SECTOR_LEADER', sector: 'FBI' };
+            else if (code === 'CIA') currentUser = { name: 'مسؤول CIA', role: 'SECTOR_LEADER', sector: 'CIA' };
+            else if (code === 'IAA') currentUser = { name: 'مسؤول IAA (العمليات السرية)', role: 'SECTOR_LEADER', sector: 'IAA' };
+            else { errorEl.classList.remove('hidden'); return; }
+
+            errorEl.classList.add('hidden');
+            document.getElementById('loginOverlay').classList.add('hidden');
+            document.getElementById('mainDashboard').classList.remove('hidden');
+
+            setupUserUI();
+            renderAllBureau();
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('mainDashboard').classList.add('hidden');
+            document.getElementById('loginOverlay').classList.remove('hidden');
+            document.getElementById('passcodeInput').value = '';
+        }
+
+        function setupUserUI() {
+            const userNameDisplay = document.getElementById('userNameDisplay');
+            const userRoleBadge = document.getElementById('userRoleBadge');
+            const topSystemRoleBadge = document.getElementById('topSystemRoleBadge');
+            
+            const agent0TaskCreator = document.getElementById('agent0TaskCreator');
+            const agent0LeaderAssign = document.getElementById('agent0LeaderAssign');
+            const sectorReportForm = document.getElementById('sectorReportForm');
+            const agent0ReportsBanner = document.getElementById('agent0ReportsBanner');
+            const reportSectorDisplay = document.getElementById('reportSectorDisplay');
+            const taskFilterButtons = document.getElementById('taskFilterButtons');
+            const agent0SectorFundSelector = document.getElementById('agent0SectorFundSelector');
+
+            userNameDisplay.innerText = currentUser.name;
+
+            if (currentUser.role === 'AGENT_0') {
+                userRoleBadge.innerText = 'مدير الاستخبارات الوطنية (Agent 0)';
+                userRoleBadge.className = 'mr-2 text-[11px] bg-amber-500 text-slate-950 font-bold px-2.5 py-0.5 rounded-full';
+                topSystemRoleBadge.innerText = 'DNI OVERSEER';
+                
+                agent0TaskCreator.classList.remove('hidden');
+                agent0LeaderAssign.classList.remove('hidden');
+                taskFilterButtons.classList.remove('hidden');
+                agent0SectorFundSelector.classList.remove('hidden');
+                
+                document.getElementById('fbiOrgCard').classList.remove('hidden');
+                document.getElementById('ciaOrgCard').classList.remove('hidden');
+                document.getElementById('iaaOrgCard').classList.remove('hidden');
+
+                document.getElementById('fbiBudgetCard').classList.remove('hidden');
+                document.getElementById('ciaBudgetCard').classList.remove('hidden');
+                document.getElementById('iaaBudgetCard').classList.remove('hidden');
+
+                sectorReportForm.classList.add('hidden');
+                agent0ReportsBanner.classList.remove('hidden');
+
+                document.getElementById('fbiHeaderBox').classList.remove('hidden');
+                document.getElementById('ciaHeaderBox').classList.remove('hidden');
+                document.getElementById('iaaHeaderBox').classList.remove('hidden');
+            } else {
+                const secName = currentUser.sector === 'IAA' ? 'IAA (العمليات السرية)' : currentUser.sector;
+                userRoleBadge.innerText = `مسؤول قطاع ${secName}`;
+                userRoleBadge.className = 'mr-2 text-[11px] bg-cyan-500 text-slate-950 font-bold px-2.5 py-0.5 rounded-full';
+                topSystemRoleBadge.innerText = `SECTOR COMMAND - ${currentUser.sector}`;
+                
+                agent0TaskCreator.classList.add('hidden');
+                agent0LeaderAssign.classList.add('hidden');
+                taskFilterButtons.classList.add('hidden');
+                agent0SectorFundSelector.classList.add('hidden');
+                
+                sectorReportForm.classList.remove('hidden');
+                agent0ReportsBanner.classList.add('hidden');
+                reportSectorDisplay.value = secName;
+
+                document.getElementById('fbiOrgCard').classList.toggle('hidden', currentUser.sector !== 'FBI');
+                document.getElementById('ciaOrgCard').classList.toggle('hidden', currentUser.sector !== 'CIA');
+                document.getElementById('iaaOrgCard').classList.toggle('hidden', currentUser.sector !== 'IAA');
+
+                document.getElementById('fbiBudgetCard').classList.toggle('hidden', currentUser.sector !== 'FBI');
+                document.getElementById('ciaBudgetCard').classList.toggle('hidden', currentUser.sector !== 'CIA');
+                document.getElementById('iaaBudgetCard').classList.toggle('hidden', currentUser.sector !== 'IAA');
+
+                document.getElementById('fbiHeaderBox').classList.toggle('hidden', currentUser.sector !== 'FBI');
+                document.getElementById('ciaHeaderBox').classList.toggle('hidden', currentUser.sector !== 'CIA');
+                document.getElementById('iaaHeaderBox').classList.toggle('hidden', currentUser.sector !== 'IAA');
+
+                document.getElementById('activeFundingSector').value = currentUser.sector;
+            }
+
+            document.getElementById('fbiLeaderInput').value = appState.leaders.FBI || '';
+            document.getElementById('ciaLeaderInput').value = appState.leaders.CIA || '';
+            document.getElementById('iaaLeaderInput').value = appState.leaders.IAA || '';
+
+            const newAgentSecSelect = document.getElementById('newAgentSector');
+            if (currentUser.role !== 'AGENT_0') {
+                newAgentSecSelect.value = currentUser.sector;
+                newAgentSecSelect.disabled = true;
+            } else {
+                newAgentSecSelect.disabled = false;
+            }
+        }
+
+        function renderAllBureau() {
+            renderLeadersSummary();
+            renderTasks(currentUser.role === 'AGENT_0' ? 'ALL' : currentUser.sector);
+            renderMembers();
+            renderTreasury();
+            renderMysteryBoxes();
+            renderReports();
+            renderChatMessages();
+        }
+
+        function renderLeadersSummary() {
+            document.getElementById('fbiLeaderDisplay').innerHTML = `المسؤول: <span class="text-white font-semibold">${appState.leaders.FBI || 'غير محدد'}</span>`;
+            document.getElementById('ciaLeaderDisplay').innerHTML = `المسؤول: <span class="text-white font-semibold">${appState.leaders.CIA || 'غير محدد'}</span>`;
+            document.getElementById('iaaLeaderDisplay').innerHTML = `المسؤول: <span class="text-white font-semibold">${appState.leaders.IAA || 'غير محدد'}</span>`;
+        }
+
+        function switchTab(tabId) {
+            currentTab = tabId;
+            document.querySelectorAll('#integratedBureauApp .tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('#integratedBureauApp .tab-btn').forEach(el => {
+                el.classList.remove('active', 'bg-amber-500', 'text-slate-950');
+                el.classList.add('bg-slate-800/40', 'text-gray-300');
+            });
+
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`tabBtn-${tabId}`);
+            activeBtn.classList.add('active', 'bg-amber-500', 'text-slate-950');
+            activeBtn.classList.remove('bg-slate-800/40', 'text-gray-300');
+        }
+
+        function handleCreateTask(e) {
+            e.preventDefault();
+            if (currentUser.role !== 'AGENT_0') return;
+
+            const title = document.getElementById('taskTitle').value;
+            const target = document.getElementById('taskTargetSector').value;
+            const reward = parseInt(document.getElementById('taskReward').value) || 0;
+            const desc = document.getElementById('taskDesc').value;
+            const bonus = document.getElementById('taskBonus').value || 'لا يوجد';
+
+            const newTask = {
+                id: Date.now(), title, target, reward, bonus, desc,
+                status: 'نشط', createdBy: 'Agent 0', date: new Date().toISOString().split('T')[0]
+            };
+
+            appState.tasks.unshift(newTask);
+            saveBureauState();
+            renderTasks('ALL');
+            e.target.reset();
+        }
+
+        function filterTasks(sector) { renderTasks(sector); }
+
+        function renderTasks(filterSector = 'ALL') {
+            const container = document.getElementById('tasksFeedList');
+            container.innerHTML = '';
+            let filtered = appState.tasks;
+
+            if (currentUser.role !== 'AGENT_0') {
+                filtered = appState.tasks.filter(t => t.target === currentUser.sector || t.target === 'ALL');
+            } else if (filterSector !== 'ALL') {
+                filtered = appState.tasks.filter(t => t.target === filterSector || t.target === 'ALL');
+            }
+
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="col-span-2 text-center py-8 text-gray-500 text-xs">لا توجد تكاليف استخباراتية حالية.</div>';
+                return;
+            }
+
+            filtered.forEach(task => {
+                let sectorBadgeClass = 'bg-slate-800 text-gray-300';
+                let sectorName = task.target;
+                if (task.target === 'FBI') sectorBadgeClass = 'bg-blue-500/20 text-blue-400 border border-blue-500/30';
+                if (task.target === 'CIA') sectorBadgeClass = 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+                if (task.target === 'IAA') {
+                    sectorBadgeClass = 'bg-purple-500/20 text-purple-400 border border-purple-500/30';
+                    sectorName = 'IAA (العمليات السرية)';
+                }
+                if (task.target === 'ALL') sectorBadgeClass = 'bg-amber-500/20 text-amber-400 border border-amber-500/30';
+
+                const card = document.createElement('div');
+                card.className = 'glass-panel p-5 rounded-2xl border border-slate-800 relative hover:border-amber-500/30 transition';
+                card.innerHTML = `
+                    <div class="flex items-start justify-between gap-2 mb-2">
+                        <span class="text-xs font-bold px-2.5 py-0.5 rounded-full ${sectorBadgeClass}">
+                            القطاع: ${sectorName}
+                        </span>
+                        <span class="text-xs font-bold bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded font-mono">
+                            المكافأة: $${formatNum(task.reward)}
+                        </span>
+                    </div>
+                    <h4 class="font-bold text-white text-base mb-1">${task.title}</h4>
+                    <p class="text-xs text-gray-300 mb-3 leading-relaxed">${task.desc}</p>
+                    <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-900 text-xs text-gray-400 flex flex-wrap items-center justify-between gap-2">
+                        <div><i class="fa-solid fa-gift text-amber-500 ml-1"></i> إضافات: <span class="text-gray-200">${task.bonus}</span></div>
+                        <div class="text-[10px] text-gray-500 font-mono">${task.date}</div>
+                    </div>
+                    ${currentUser.role === 'AGENT_0' ? `
+                    <div class="mt-3 text-left">
+                        <button onclick="deleteTask(${task.id})" class="text-xs text-rose-400 hover:text-rose-300"><i class="fa-solid fa-trash ml-1"></i> إلغاء المهمة</button>
+                    </div>
+                    ` : ''}
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function deleteTask(id) {
+            appState.tasks = appState.tasks.filter(t => t.id !== id);
+            saveBureauState();
+            renderTasks(currentUser.role === 'AGENT_0' ? 'ALL' : currentUser.sector);
+        }
+
+        function assignLeader(sector) {
+            if (currentUser.role !== 'AGENT_0') return;
+            const inputVal = document.getElementById(`${sector.toLowerCase()}LeaderInput`).value;
+            appState.leaders[sector] = inputVal;
+            saveBureauState();
+            renderLeadersSummary();
+        }
+
+        function handleAddMember(e) {
+            e.preventDefault();
+            const name = document.getElementById('newAgentName').value;
+            const rank = document.getElementById('newAgentRank').value;
+            const sector = currentUser.role === 'AGENT_0' ? document.getElementById('newAgentSector').value : currentUser.sector;
+
+            appState.members.push({ id: Date.now(), name, rank, sector });
+            saveBureauState();
+            renderMembers();
+            e.target.reset();
+        }
+
+        function removeMember(id) {
+            appState.members = appState.members.filter(m => m.id !== id);
+            saveBureauState();
+            renderMembers();
+        }
+
+        function renderMembers() {
+            const fbiList = document.getElementById('fbiMemberList');
+            const ciaList = document.getElementById('ciaMemberList');
+            const iaaList = document.getElementById('iaaMemberList');
+
+            fbiList.innerHTML = ''; ciaList.innerHTML = ''; iaaList.innerHTML = '';
+
+            const fbiMembers = appState.members.filter(m => m.sector === 'FBI');
+            const ciaMembers = appState.members.filter(m => m.sector === 'CIA');
+            const iaaMembers = appState.members.filter(m => m.sector === 'IAA');
+
+            document.getElementById('fbiCount').innerText = fbiMembers.length;
+            document.getElementById('ciaCount').innerText = ciaMembers.length;
+            document.getElementById('iaaCount').innerText = iaaMembers.length;
+
+            const renderItem = (m) => `
+                <div class="flex items-center justify-between bg-slate-950 p-2.5 rounded-xl border border-slate-900 text-xs">
+                    <div>
+                        <div class="font-bold text-white">${m.name}</div>
+                        <div class="text-[10px] text-gray-400">${m.rank}</div>
+                    </div>
+                    <button onclick="removeMember(${m.id})" class="text-rose-500 hover:text-rose-400 p-1"><i class="fa-solid fa-user-minus"></i></button>
+                </div>
+            `;
+
+            if (currentUser.role === 'AGENT_0' || currentUser.sector === 'FBI') fbiMembers.forEach(m => fbiList.innerHTML += renderItem(m));
+            if (currentUser.role === 'AGENT_0' || currentUser.sector === 'CIA') ciaMembers.forEach(m => ciaList.innerHTML += renderItem(m));
+            if (currentUser.role === 'AGENT_0' || currentUser.sector === 'IAA') iaaMembers.forEach(m => iaaList.innerHTML += renderItem(m));
+        }
+
+        function renderTreasury() {
+            document.getElementById('fbiBudget').innerText = `$${formatNum(appState.budgets.FBI)}`;
+            document.getElementById('ciaBudget').innerText = `$${formatNum(appState.budgets.CIA)}`;
+            document.getElementById('iaaBudget').innerText = `$${formatNum(appState.budgets.IAA)}`;
+        }
+
+        function renderMysteryBoxes() {
+            const grid = document.getElementById('mysteryBoxesGrid');
+            grid.innerHTML = '';
+
+            const activeSector = currentUser.role === 'AGENT_0' ? document.getElementById('activeFundingSector').value : currentUser.sector;
+            const unlockedList = appState.unlockedBoxes[activeSector] || [];
+            const isAgent0 = currentUser.role === 'AGENT_0';
+
+            mysteryBoxesData.forEach((box) => {
+                const isUnlocked = unlockedList.includes(box.id);
+                const canUnlock = !isUnlocked && (box.id === 1 || unlockedList.includes(box.id - 1));
+
+                const boxCard = document.createElement('div');
+                
+                if (isUnlocked) {
+                    boxCard.className = 'glass-panel p-4 rounded-2xl border border-emerald-500/40 bg-emerald-950/10 text-center flex flex-col justify-between relative overflow-hidden';
+                    boxCard.innerHTML = `
+                        <div class="text-emerald-400 text-2xl mb-2"><i class="fa-solid ${box.icon}"></i></div>
+                        <div class="text-xs font-bold text-white mb-1">${box.name}</div>
+                        <div class="text-[10px] text-gray-300 leading-tight mb-2">${box.desc}</div>
+                        <span class="text-[10px] bg-emerald-500/20 text-emerald-300 py-1 px-2 rounded-lg font-bold border border-emerald-500/30">مفتوح للقطاع</span>
+                    `;
+                } else if (canUnlock) {
+                    boxCard.className = 'glass-panel p-4 rounded-2xl border border-amber-500/60 bg-amber-950/10 text-center flex flex-col justify-between pulse-gold';
+                    boxCard.innerHTML = `
+                        <div class="text-amber-500 text-3xl mb-2 animate-bounce"><i class="fa-solid fa-circle-question"></i></div>
+                        <div class="text-xs font-bold text-amber-300 mb-1">مربع غامض #${box.id}</div>
+                        <div class="text-xs font-bold text-amber-400 mb-3 font-mono">$${formatNum(box.cost)}</div>
+                        ${!isAgent0 ? `
+                        <button onclick="unlockMysteryBox('${activeSector}', ${box.id}, ${box.cost})" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-1.5 rounded-lg text-xs transition">
+                            <i class="fa-solid fa-lock-open ml-1"></i> شراء المربع
+                        </button>
+                        ` : `
+                        <span class="text-[10px] text-amber-400/80 bg-amber-500/10 py-1 px-2 rounded border border-amber-500/20">قابل للفتح من رئيس القطاع</span>
+                        `}
+                    `;
+                } else {
+                    boxCard.className = 'glass-panel p-4 rounded-2xl border border-slate-800 opacity-50 text-center flex flex-col justify-between';
+                    boxCard.innerHTML = `
+                        <div class="text-gray-600 text-3xl mb-2"><i class="fa-solid fa-lock"></i></div>
+                        <div class="text-xs font-bold text-gray-400 mb-1">مربع غامض #${box.id}</div>
+                        <div class="text-xs font-bold text-gray-500 mb-2 font-mono">$${formatNum(box.cost)}</div>
+                        <span class="text-[10px] text-gray-500">يتطلب فتح المربع السابق</span>
+                    `;
+                }
+
+                grid.appendChild(boxCard);
+            });
+        }
+
+        function unlockMysteryBox(sector, boxId, cost) {
+            if (currentUser.role === 'AGENT_0') return;
+            
+            if (appState.budgets[sector] < cost) {
+                alert(`رصيد الميزانية غير كافٍ! تحتاج إلى $${formatNum(cost)} لفتح هذا المربع.`);
+                return;
+            }
+
+            appState.budgets[sector] -= cost;
+            if (!appState.unlockedBoxes[sector]) appState.unlockedBoxes[sector] = [];
+            appState.unlockedBoxes[sector].push(boxId);
+
+            saveBureauState();
+            renderTreasury();
+            renderMysteryBoxes();
+        }
+
+        function handleSubmitReport(e) {
+            e.preventDefault();
+            if (currentUser.role === 'AGENT_0') return;
+
+            const taskTitle = document.getElementById('reportTaskTitle').value;
+            const content = document.getElementById('reportContent').value;
+            const sector = currentUser.sector;
+
+            appState.reports.unshift({
+                id: Date.now(), taskTitle, sector, content,
+                status: 'قيد المراجعة', date: new Date().toISOString().split('T')[0]
+            });
+
+            saveBureauState();
+            renderReports();
+            e.target.reset();
+        }
+
+        function updateReportStatus(id, newStatus) {
+            const rep = appState.reports.find(r => r.id === id);
+            if (rep) {
+                rep.status = newStatus;
+                saveBureauState();
+                renderReports();
+            }
+        }
+
+        function renderReports() {
+            const container = document.getElementById('reportsList');
+            container.innerHTML = '';
+
+            let filtered = appState.reports;
+            if (currentUser.role !== 'AGENT_0') {
+                filtered = appState.reports.filter(r => r.sector === currentUser.sector);
+            }
+
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="text-center py-6 text-xs text-gray-500">لا توجد تقارير مرفوعة.</div>';
+                return;
+            }
+
+            filtered.forEach(rep => {
+                let statusBadge = 'bg-amber-500/20 text-amber-300';
+                if (rep.status === 'مقبول') statusBadge = 'bg-emerald-500/20 text-emerald-300';
+                if (rep.status === 'مرفوض') statusBadge = 'bg-rose-500/20 text-rose-300';
+
+                const secBadgeName = rep.sector === 'IAA' ? 'IAA (العمليات السرية)' : rep.sector;
+
+                const card = document.createElement('div');
+                card.className = 'glass-panel p-4 rounded-xl border border-slate-800 space-y-2';
+                card.innerHTML = `
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="font-bold text-white">${rep.taskTitle} (القطاع: <span class="text-amber-400">${secBadgeName}</span>)</span>
+                        <span class="px-2 py-0.5 rounded font-bold ${statusBadge}">${rep.status}</span>
+                    </div>
+                    <p class="text-xs text-gray-300 leading-relaxed bg-slate-950 p-2.5 rounded-lg border border-slate-900">${rep.content}</p>
+                    <div class="flex items-center justify-between text-[10px] text-gray-500 pt-1">
+                        <span class="font-mono">التاريخ: ${rep.date}</span>
+                        ${currentUser.role === 'AGENT_0' && rep.status === 'قيد المراجعة' ? `
+                        <div class="flex gap-2">
+                            <button onclick="updateReportStatus(${rep.id}, 'مقبول')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-1 rounded">اعتماد التقرير</button>
+                            <button onclick="updateReportStatus(${rep.id}, 'مرفوض')" class="bg-rose-600 hover:bg-rose-500 text-white font-bold px-3 py-1 rounded">رفض</button>
+                        </div>
+                        ` : ''}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function handleSendMessage(e) {
+            e.preventDefault();
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            const msgTypeSelect = document.getElementById('chatMessageTypeSelect').value;
+
+            if (!text) return;
+
+            let msgObj = {
+                id: Date.now(),
+                senderSector: currentUser.sector,
+                senderName: currentUser.name,
+                text,
+                time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })
+            };
+
+            if (msgTypeSelect === 'BROADCAST') {
+                msgObj.type = 'BROADCAST';
+            } else if (msgTypeSelect.startsWith('DIRECT_')) {
+                msgObj.type = 'DIRECT_SECTOR';
+                msgObj.targetSector = msgTypeSelect.replace('DIRECT_', '');
+            } else if (msgTypeSelect === 'FED_DIRECT') {
+                msgObj.type = 'FED_DIRECT';
+            }
+
+            appState.messages.push(msgObj);
+            saveBureauState();
+            renderChatMessages();
+            input.value = '';
+        }
+
+        function renderChatMessages() {
+            const container = document.getElementById('chatMessagesContainer');
+            container.innerHTML = '';
+
+            const visibleMessages = appState.messages.filter(m => {
+                if (currentUser.role === 'AGENT_0') return true;
+                if (m.type === 'BROADCAST') return true;
+                if (m.type === 'DIRECT_SECTOR') {
+                    return m.senderSector === currentUser.sector || m.targetSector === currentUser.sector;
+                }
+                if (m.type === 'FED_DIRECT') {
+                    return m.senderSector === currentUser.sector || m.senderSector === 'FED';
+                }
+                return false;
+            });
+
+            if (visibleMessages.length === 0) {
+                container.innerHTML = '<div class="text-center py-8 text-xs text-gray-500">لا توجد رسائل في هذه القناة.</div>';
+                return;
+            }
+
+            visibleMessages.forEach(msg => {
+                const isMe = msg.senderName === currentUser.name;
+                const msgEl = document.createElement('div');
+                msgEl.className = `flex flex-col ${isMe ? 'items-start' : 'items-end'}`;
+
+                let typeLabel = 'عبر البث العام';
+                let borderStyle = 'border-slate-800';
+
+                if (msg.type === 'DIRECT_SECTOR') {
+                    typeLabel = `سرية إلى (${msg.targetSector})`;
+                    borderStyle = 'border-blue-500/40';
+                } else if (msg.type === 'FED_DIRECT') {
+                    typeLabel = 'برقية مباشرة مع الاستخبارات الوطنية';
+                    borderStyle = 'border-amber-500/40';
+                }
+
+                const senderSectorTitle = msg.senderSector === 'IAA' ? 'IAA (العمليات السرية)' : msg.senderSector;
+
+                msgEl.innerHTML = `
+                    <div class="max-w-[85%] rounded-2xl px-4 py-2.5 text-xs space-y-1 ${
+                        isMe 
+                        ? 'bg-amber-500 text-slate-950 font-medium rounded-tr-none' 
+                        : 'bg-slate-900 border ' + borderStyle + ' text-gray-100 rounded-tl-none'
+                    }">
+                        <div class="text-[10px] font-bold opacity-80 flex items-center justify-between gap-4 border-b border-black/10 pb-1">
+                            <span>${msg.senderName} (${senderSectorTitle})</span>
+                            <span class="font-mono text-[9px]">${msg.time} • ${typeLabel}</span>
+                        </div>
+                        <div class="pt-1">${msg.text}</div>
+                    </div>
+                `;
+                container.appendChild(msgEl);
+            });
+
+            container.scrollTop = container.scrollHeight;
+        }
+  </script>
+ </body>
+</html>
